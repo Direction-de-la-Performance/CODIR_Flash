@@ -1016,9 +1016,7 @@ function exportCSV(){
                 t.lastMod?new Date(t.lastMod).toLocaleString('fr-FR'):""
         ].map(function(v){ return '"'+v.toString().replace(/"/g,'""')+'"'; }).join(";");
     });
-    dl("﻿"+h.join(";")+"
-"+rows.join("
-"),"Export_Kanban_"+td()+".csv","text/csv;charset=utf-8;");
+    dl("\uFEFF"+h.join(";")+"\n"+rows.join("\n"),"Export_Kanban_"+td()+".csv","text/csv;charset=utf-8;");
 }
 function exportJSON(){ dl(JSON.stringify(buildPayload(),null,2),"Backup_Kanban_"+td()+".json","application/json"); }
 function importJSON(event){
