@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>CODIR Flash Perf</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230f3460'/><rect x='12' y='20' width='22' height='60' rx='4' fill='%23e74c3c'/><rect x='39' y='35' width='22' height='45' rx='4' fill='%23e67e22'/><rect x='66' y='25' width='22' height='55' rx='4' fill='%2327ae60'/></svg>">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='15' fill='%231a1a2e'/><polygon points='58,8 28,55 48,55 42,92 72,45 52,45' fill='%23f39c12' stroke='%23e67e22' stroke-width='2'/></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
@@ -19,230 +19,132 @@
             --radius:    10px;
         }
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body {
-            height: 100%; width: 100%;
-            font-family: 'DM Sans', sans-serif;
-            background: var(--bg); color: var(--text); overflow-x: hidden;
-        }
-        body { padding: 16px; }
+        html, body { height:100%; width:100%; font-family:'DM Sans',sans-serif; background:var(--bg); color:var(--text); overflow-x:hidden; }
+        body { padding:16px; }
 
-        .fullscreen {
-            position: fixed; inset: 0;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            display: flex; align-items: center; justify-content: center; z-index: 9999;
-        }
-        #login-screen .box {
-            background: rgba(255,255,255,0.06);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255,255,255,0.12);
-            padding: 48px 40px; border-radius: 20px;
-            text-align: center; min-width: 340px;
-            box-shadow: 0 24px 60px rgba(0,0,0,0.5);
-        }
-        .app-title  { font-size: 1.5em; font-weight: 700; color: white; margin-bottom: 4px; }
-        .app-sub    { color: rgba(255,255,255,0.4); font-size: 0.82em; margin-bottom: 28px; }
-        .lock-icon  { font-size: 2.2em; margin-bottom: 12px; display: block; }
-        #login-screen input {
-            width: 100%; padding: 14px 16px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 10px; color: white;
-            font-size: 1.1em; text-align: center; letter-spacing: 3px;
-            font-family: 'DM Mono', monospace;
-            transition: border-color 0.2s; margin-bottom: 10px;
-        }
-        #login-screen input::placeholder { color: rgba(255,255,255,0.25); letter-spacing: 1px; font-size: 0.9em; }
-        #login-screen input:focus { outline: none; border-color: rgba(255,255,255,0.4); }
-        #login-error { color: #e74c3c; font-size: 0.82em; min-height: 20px; margin-bottom: 8px; }
-        #login-btn {
-            width: 100%; padding: 14px;
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            border: none; border-radius: 10px;
-            color: white; font-size: 1em; font-weight: 700;
-            cursor: pointer; letter-spacing: 0.5px;
-            transition: transform 0.15s, box-shadow 0.15s;
-            box-shadow: 0 4px 16px rgba(52,152,219,0.4);
-            font-family: inherit;
-        }
-        #login-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(52,152,219,0.5); }
+        /* ── LOGIN / LOADING ── */
+        .fullscreen { position:fixed; inset:0; background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%); display:flex; align-items:center; justify-content:center; z-index:9999; }
+        #login-screen .box { background:rgba(255,255,255,0.06); backdrop-filter:blur(20px); border:1px solid rgba(255,255,255,0.12); padding:48px 40px; border-radius:20px; text-align:center; min-width:340px; box-shadow:0 24px 60px rgba(0,0,0,0.5); }
+        .app-title  { font-size:1.5em; font-weight:700; color:white; margin-bottom:4px; }
+        .app-sub    { color:rgba(255,255,255,0.4); font-size:0.82em; margin-bottom:28px; }
+        .lock-icon  { font-size:2.2em; margin-bottom:12px; display:block; }
+        #login-screen input { width:100%; padding:14px 16px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:white; font-size:1.1em; text-align:center; letter-spacing:3px; font-family:'DM Mono',monospace; transition:border-color 0.2s; margin-bottom:10px; }
+        #login-screen input::placeholder { color:rgba(255,255,255,0.25); letter-spacing:1px; font-size:0.9em; }
+        #login-screen input:focus { outline:none; border-color:rgba(255,255,255,0.4); }
+        #login-error { color:#e74c3c; font-size:0.82em; min-height:20px; margin-bottom:8px; }
+        #login-btn { width:100%; padding:14px; background:linear-gradient(135deg,#3498db,#2980b9); border:none; border-radius:10px; color:white; font-size:1em; font-weight:700; cursor:pointer; letter-spacing:0.5px; transition:transform 0.15s,box-shadow 0.15s; box-shadow:0 4px 16px rgba(52,152,219,0.4); font-family:inherit; }
+        #login-btn:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(52,152,219,0.5); }
+        #loading-screen { display:none; }
+        #loading-screen .box { text-align:center; color:white; }
+        .spinner { width:48px; height:48px; margin:0 auto 24px; border:4px solid rgba(255,255,255,0.15); border-top-color:#3498db; border-radius:50%; animation:spin 0.8s linear infinite; }
+        @keyframes spin { to{transform:rotate(360deg);} }
+        .loading-title { font-size:1.3em; font-weight:700; margin-bottom:8px; }
+        .loading-sub   { color:rgba(255,255,255,0.45); font-size:0.85em; }
+        .loading-error { margin-top:20px; padding:12px 16px; background:rgba(231,76,60,0.2); border:1px solid rgba(231,76,60,0.4); border-radius:8px; color:#e74c3c; font-size:0.82em; display:none; }
+        .loading-retry { margin-top:14px; padding:10px 24px; background:#3498db; border:none; border-radius:8px; color:white; font-size:0.9em; font-weight:600; cursor:pointer; font-family:inherit; display:none; }
 
-        #loading-screen { display: none; }
-        #loading-screen .box { text-align: center; color: white; }
-        .spinner {
-            width: 48px; height: 48px; margin: 0 auto 24px;
-            border: 4px solid rgba(255,255,255,0.15);
-            border-top-color: #3498db;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        .loading-title { font-size: 1.3em; font-weight: 700; margin-bottom: 8px; }
-        .loading-sub   { color: rgba(255,255,255,0.45); font-size: 0.85em; }
-        .loading-error {
-            margin-top: 20px; padding: 12px 16px;
-            background: rgba(231,76,60,0.2); border: 1px solid rgba(231,76,60,0.4);
-            border-radius: 8px; color: #e74c3c; font-size: 0.82em; display: none;
-        }
-        .loading-retry {
-            margin-top: 14px; padding: 10px 24px;
-            background: #3498db; border: none; border-radius: 8px;
-            color: white; font-size: 0.9em; font-weight: 600;
-            cursor: pointer; font-family: inherit; display: none;
-        }
-
-        #sync-status {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 0.75em; color: var(--muted); padding: 5px 10px;
-            background: var(--bg); border-radius: 20px;
-        }
-        #sync-dot { width: 8px; height: 8px; border-radius: 50%; background: #27ae60; transition: background 0.3s; }
-        #sync-dot.synced  { background: #27ae60; }
-        #sync-dot.syncing { background: #f39c12; animation: pulse 1s infinite; }
-        #sync-dot.error   { background: #e74c3c; }
+        /* ── SYNC ── */
+        #sync-status { display:inline-flex; align-items:center; gap:6px; font-size:0.75em; color:var(--muted); padding:5px 10px; background:var(--bg); border-radius:20px; }
+        #sync-dot { width:8px; height:8px; border-radius:50%; background:#27ae60; transition:background 0.3s; }
+        #sync-dot.synced  { background:#27ae60; }
+        #sync-dot.syncing { background:#f39c12; animation:pulse 1s infinite; }
+        #sync-dot.error   { background:#e74c3c; }
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
 
-        #app { display: none; }
+        #app { display:none; }
 
-        .header-bar {
-            display: flex; justify-content: space-between; align-items: center;
-            background: var(--white); padding: 12px 16px;
-            border-radius: var(--radius); box-shadow: var(--shadow-sm);
-            margin-bottom: 16px; gap: 12px; flex-wrap: wrap;
-        }
-        .header-left { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .header-right { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 280px; }
-        .header-right label { font-weight: 600; font-size: 0.82em; color: var(--muted); white-space: nowrap; }
-        .header-right textarea {
-            flex-grow: 1; height: 58px; font-size: 13px; padding: 8px 10px;
-            border: 1px solid var(--border); border-radius: 8px;
-            background: #fffdf2; resize: none; font-family: inherit;
-            transition: border-color 0.2s;
-        }
-        .header-right textarea:focus { outline: none; border-color: #3498db; }
-        .codir-date-wrap {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--bg); padding: 6px 12px; border-radius: 20px; white-space: nowrap;
-        }
-        .codir-date-wrap label { font-weight: 700; font-size: 0.8em; color: var(--text); white-space: nowrap; }
-        .codir-date-wrap input[type=date] {
-            border: 1.5px solid var(--border); border-radius: 8px; padding: 4px 8px;
-            font-size: 0.82em; font-family: inherit; background: white; color: var(--text); width: auto;
-        }
-        .codir-date-wrap input[type=date]:focus { outline: none; border-color: #3498db; }
-        .col-sub {
-            display: inline-block; margin-top: 5px;
-            background: rgba(255,255,255,0.32); color: rgba(255,255,255,0.95);
-            font-size: 0.72em; font-weight: 500; letter-spacing: 0.2px;
-            padding: 3px 9px; border-radius: 10px; text-transform: none;
-        }
-        .col-sub .col-count {
-            background: rgba(255,255,255,0.45); color: rgba(0,0,0,0.55);
-            padding: 1px 6px; border-radius: 8px; font-size: 1em; margin-left: 5px;
-        }
-        .btn-misc { background: #16a085; }
-        .btn-misc .misc-date { font-size: 0.72em; opacity: 0.8; font-weight: 400; }
-        #miscTextarea { width: 100%; min-height: 180px; resize: vertical; font-family: inherit;
-            font-size: 0.9em; padding: 10px 12px; border: 1.5px solid var(--border);
-            border-radius: 8px; background: #fffdf2; }
+        /* ── HEADER ── */
+        .header-bar { display:flex; justify-content:space-between; align-items:center; background:var(--white); padding:12px 16px; border-radius:var(--radius); box-shadow:var(--shadow-sm); margin-bottom:16px; gap:12px; flex-wrap:wrap; }
+        .header-left { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+        .codir-date-wrap { display:flex; align-items:center; gap:8px; background:var(--bg); padding:6px 12px; border-radius:20px; white-space:nowrap; }
+        .codir-date-wrap label { font-weight:700; font-size:0.8em; color:var(--text); }
+        .codir-date-wrap input[type=date] { border:1.5px solid var(--border); border-radius:8px; padding:4px 8px; font-size:0.82em; font-family:inherit; background:white; color:var(--text); width:auto; }
+        .codir-date-wrap input[type=date]:focus { outline:none; border-color:#3498db; }
 
-        button {
-            border: none; border-radius: 8px; cursor: pointer; color: white;
-            padding: 9px 14px; font-weight: 600; font-size: 0.82em;
-            display: inline-flex; align-items: center; gap: 6px;
-            transition: filter 0.15s, transform 0.15s; font-family: inherit;
-        }
-        button:hover { filter: brightness(1.1); transform: translateY(-1px); }
-        .btn-add    { background: #3498db; }
-        .btn-actors { background: #34495e; }
-        .btn-export { background: #27ae60; }
-        .btn-backup { background: #8e44ad; }
-        .btn-sort   { background: #9b59b6; }
-        .btn-logout { background: #95a5a6; }
+        /* ── BUTTONS ── */
+        button { border:none; border-radius:8px; cursor:pointer; color:white; padding:9px 14px; font-weight:600; font-size:0.82em; display:inline-flex; align-items:center; gap:6px; transition:filter 0.15s,transform 0.15s; font-family:inherit; }
+        button:hover { filter:brightness(1.1); transform:translateY(-1px); }
+        .btn-add     { background:#3498db; }
+        .btn-actors  { background:#34495e; }
+        .btn-themes  { background:#8e44ad; }
+        .btn-export  { background:#27ae60; }
+        .btn-backup  { background:#e67e22; }
+        .btn-import  { background:#95a5a6; }
+        .btn-sort    { background:#9b59b6; }
+        .btn-misc    { background:#16a085; }
+        .btn-logout  { background:#95a5a6; }
+        .misc-date   { font-size:0.72em; opacity:0.8; font-weight:400; }
 
-        #kanban { display: flex; gap: 14px; align-items: flex-start; padding-bottom: 30px; }
-        .column {
-            flex: 1; background: #dde1e7; border-radius: var(--radius);
-            padding: 12px; min-height: 75vh; min-width: 280px;
-        }
-        .column h2 {
-            text-align: center; color: white; padding: 10px 12px;
-            border-radius: 7px; margin-bottom: 12px;
-            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.8px; font-weight: 700;
-        }
-        #todo  h2 { background: #e74c3c; }
-        #doing h2 { background: #e67e22; }
-        #done  h2 { background: #27ae60; }
-        .col-count {
-            display: inline-block; background: rgba(255,255,255,0.3);
-            padding: 1px 7px; border-radius: 10px; font-size: 0.75em; margin-left: 6px;
-        }
-        .task-list { min-height: 300px; }
+        /* ── KANBAN ── */
+        #kanban { display:flex; gap:14px; align-items:flex-start; padding-bottom:30px; }
+        .column { flex:1; background:#dde1e7; border-radius:var(--radius); padding:12px; min-height:75vh; min-width:280px; }
+        .column h2 { text-align:center; color:white; padding:10px 12px; border-radius:7px; margin-bottom:12px; font-size:0.85rem; text-transform:uppercase; letter-spacing:0.8px; font-weight:700; }
+        #todo  h2 { background:#e74c3c; }
+        #doing h2 { background:#e67e22; }
+        #done  h2 { background:#27ae60; }
+        .col-sub { display:inline-block; margin-top:5px; background:rgba(255,255,255,0.32); color:rgba(255,255,255,0.95); font-size:0.72em; font-weight:500; padding:3px 9px; border-radius:10px; }
+        .col-count { display:inline-block; background:rgba(255,255,255,0.45); color:rgba(0,0,0,0.55); padding:1px 6px; border-radius:8px; font-size:1em; margin-left:5px; }
+        .task-list { min-height:300px; }
 
-        .task {
-            background: var(--white); padding: 13px 14px; margin-bottom: 10px;
-            border-radius: 8px; box-shadow: var(--shadow-sm);
-            border-left: 5px solid #ccc; cursor: grab; position: relative;
-            transition: box-shadow 0.15s, transform 0.15s;
-        }
-        .task:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
-        .task.dragging { opacity: 0.35; transform: rotate(1.5deg); }
-        .last-mod    { position: absolute; top: 7px; right: 10px; font-size: 0.68em; color: #bbb; font-family: 'DM Mono', monospace; }
-        .tag-theme   { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 0.72em; font-weight: 700; color: white; margin-bottom: 7px; }
-        .task-title  { display: block; font-weight: 700; font-size: 0.92em; margin-bottom: 4px; padding-right: 70px; line-height: 1.35; }
-        .task-desc   { font-size: 0.82em; color: #666; margin: 4px 0 6px; line-height: 1.4; }
-        .actor-label { display: inline-block; background: #7f8c8d; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.68em; margin: 2px 2px 2px 0; }
-        .task-dates  { font-size: 0.72em; color: var(--muted); margin: 5px 0; display: flex; align-items: center; gap: 5px; }
-        .task-dates.overdue { color: #e74c3c; font-weight: 600; }
-        .task-url    { display: block; font-size: 0.72em; color: #3498db; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 6px; border-top: 1px dashed #eee; padding-top: 5px; }
-        .task-url:hover { text-decoration: underline; }
-        .comment-box { background: #f8f9fa; border-left: 3px solid #3498db; padding: 5px 8px; margin-top: 5px; border-radius: 4px; font-size: 0.78em; display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
-        .del-com { color: #e74c3c; cursor: pointer; font-weight: bold; flex-shrink: 0; }
-        .task-actions { margin-top: 9px; display: none; gap: 4px; border-top: 1px solid #f0f0f0; padding-top: 8px; flex-wrap: wrap; }
-        .task:hover .task-actions { display: flex; }
-        .task-actions button { padding: 4px 8px; font-size: 0.8em; border-radius: 6px; }
-        .priority-dot { margin-right: 4px; font-size: 0.9em; }
+        /* ── CARDS ── */
+        .task { background:var(--white); padding:13px 14px; margin-bottom:10px; border-radius:8px; box-shadow:var(--shadow-sm); border-left:5px solid #ccc; cursor:grab; position:relative; transition:box-shadow 0.15s,transform 0.15s; }
+        .task:hover { box-shadow:var(--shadow-md); transform:translateY(-1px); }
+        .task.dragging { opacity:0.35; transform:rotate(1.5deg); }
+        .last-mod    { position:absolute; top:7px; right:10px; font-size:0.68em; color:#bbb; font-family:'DM Mono',monospace; }
+        .tag-theme   { display:inline-block; padding:2px 8px; border-radius:4px; font-size:0.72em; font-weight:700; color:white; margin-bottom:7px; }
+        .task-title  { display:block; font-weight:700; font-size:0.92em; margin-bottom:4px; padding-right:70px; line-height:1.35; }
+        .task-desc   { font-size:0.82em; color:#666; margin:4px 0 6px; line-height:1.4; white-space:pre-wrap; }
+        .actor-label { display:inline-block; background:#7f8c8d; color:white; padding:2px 8px; border-radius:10px; font-size:0.68em; margin:2px 2px 2px 0; }
+        .task-dates  { font-size:0.72em; color:var(--muted); margin:5px 0; display:flex; align-items:center; gap:5px; }
+        .task-dates.overdue { color:#e74c3c; font-weight:600; }
+        .task-url    { display:block; font-size:0.72em; color:#3498db; text-decoration:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; margin-top:6px; border-top:1px dashed #eee; padding-top:5px; }
+        .task-url:hover { text-decoration:underline; }
+        .comment-box { background:#f8f9fa; border-left:3px solid #3498db; padding:5px 8px; margin-top:5px; border-radius:4px; font-size:0.78em; display:flex; justify-content:space-between; align-items:flex-start; gap:6px; }
+        .del-com { color:#e74c3c; cursor:pointer; font-weight:bold; flex-shrink:0; }
+        .task-actions { margin-top:9px; display:none; gap:4px; border-top:1px solid #f0f0f0; padding-top:8px; flex-wrap:wrap; }
+        .task:hover .task-actions { display:flex; }
+        .task-actions button { padding:4px 8px; font-size:0.8em; border-radius:6px; }
+        .priority-dot { margin-right:4px; font-size:0.9em; }
 
-        #archives-section { margin-top: 16px; background: var(--white); padding: 14px 16px; border-radius: var(--radius); box-shadow: var(--shadow-sm); }
-        #archives-section h3 { cursor: pointer; color: var(--muted); font-size: 0.9em; font-weight: 600; user-select: none; }
-        #archives-content { flex-wrap: wrap; gap: 10px; margin-top: 14px; }
-        #archives-content .task { min-width: 260px; max-width: 320px; opacity: 0.7; cursor: default; }
-        #archives-content .task:hover { opacity: 1; }
+        /* ── ARCHIVES ── */
+        #archives-section { margin-top:16px; background:var(--white); padding:14px 16px; border-radius:var(--radius); box-shadow:var(--shadow-sm); }
+        #archives-section h3 { cursor:pointer; color:var(--muted); font-size:0.9em; font-weight:600; user-select:none; }
+        #archives-content { flex-wrap:wrap; gap:10px; margin-top:14px; }
+        #archives-content .task { min-width:260px; max-width:320px; opacity:0.7; cursor:default; }
+        #archives-content .task:hover { opacity:1; }
 
-        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.55); z-index: 1000; align-items: center; justify-content: center; }
-        .overlay.open { display: flex; }
-        .modal {
-            background: white; padding: 28px; border-radius: 14px;
-            width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.25); animation: slideUp 0.2s ease;
-        }
-        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal h3 { margin-bottom: 18px; font-size: 1.1em; font-weight: 700; }
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; font-weight: 600; font-size: 0.8em; color: #555; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.4px; }
-        input[type=text], input[type=url], input[type=date], input[type=password], textarea, select {
-            width: 100%; padding: 10px 12px; border: 1.5px solid var(--border);
-            border-radius: 8px; font-family: inherit; font-size: 0.9em;
-            transition: border-color 0.2s; background: white; color: var(--text);
-        }
-        input:focus, textarea:focus, select:focus { outline: none; border-color: #3498db; }
-        .row { display: flex; gap: 10px; }
-        .row > .form-group { flex: 1; }
-        .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
-        .modal-actions button { flex: 1; justify-content: center; padding: 12px; font-size: 0.9em; }
-        .btn-save   { background: #27ae60; }
-        .btn-cancel { background: #95a5a6; }
+        /* ── MODALS ── */
+        .overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.55); z-index:1000; align-items:center; justify-content:center; }
+        .overlay.open { display:flex; }
+        .modal { background:white; padding:28px; border-radius:14px; width:90%; max-width:500px; max-height:90vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.25); animation:slideUp 0.2s ease; }
+        @keyframes slideUp { from{transform:translateY(20px);opacity:0;} to{transform:translateY(0);opacity:1;} }
+        .modal h3 { margin-bottom:18px; font-size:1.1em; font-weight:700; }
+        .form-group { margin-bottom:12px; }
+        .form-group label { display:block; font-weight:600; font-size:0.8em; color:#555; margin-bottom:5px; text-transform:uppercase; letter-spacing:0.4px; }
+        input[type=text], input[type=url], input[type=date], input[type=password], textarea, select { width:100%; padding:10px 12px; border:1.5px solid var(--border); border-radius:8px; font-family:inherit; font-size:0.9em; transition:border-color 0.2s; background:white; color:var(--text); }
+        input:focus, textarea:focus, select:focus { outline:none; border-color:#3498db; }
+        .row { display:flex; gap:10px; }
+        .row > .form-group { flex:1; }
+        .modal-actions { display:flex; gap:8px; margin-top:16px; }
+        .modal-actions button { flex:1; justify-content:center; padding:12px; font-size:0.9em; }
+        .btn-save   { background:#27ae60; }
+        .btn-cancel { background:#95a5a6; }
 
-        #toast {
-            position: fixed; bottom: 24px; right: 24px;
-            background: #2c3e50; color: white; padding: 12px 20px;
-            border-radius: 10px; font-size: 0.85em; font-weight: 600;
-            box-shadow: var(--shadow-md); z-index: 9999;
-            transform: translateY(80px); opacity: 0;
-            transition: transform 0.3s, opacity 0.3s; pointer-events: none;
-        }
-        #toast.show { transform: translateY(0); opacity: 1; }
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-thumb { background: #ccc; border-radius: 3px; }
+        /* ── THEME MANAGER ── */
+        .theme-row { display:flex; align-items:center; gap:10px; padding:10px 12px; border-bottom:1px solid #f0f0f0; }
+        .theme-color-swatch { width:28px; height:28px; border-radius:6px; border:2px solid rgba(0,0,0,0.1); flex-shrink:0; }
+        .theme-label-text { flex:1; font-size:0.9em; font-weight:600; }
+        .theme-del-btn { color:#e74c3c; cursor:pointer; font-size:0.8em; font-weight:700; background:none; border:1px solid #e74c3c; color:#e74c3c; border-radius:6px; padding:3px 8px; }
+        .theme-del-btn:hover { background:#e74c3c; color:white; transform:none; filter:none; }
+        .new-theme-row { display:flex; gap:8px; align-items:center; margin-top:14px; padding-top:14px; border-top:1px solid #eee; }
+        .new-theme-row input[type=text] { flex:1; padding:8px 10px; }
+        .new-theme-row input[type=color] { width:42px; height:38px; padding:2px 4px; border-radius:8px; border:1.5px solid var(--border); cursor:pointer; background:white; }
+
+        /* ── TOAST ── */
+        #toast { position:fixed; bottom:24px; right:24px; background:#2c3e50; color:white; padding:12px 20px; border-radius:10px; font-size:0.85em; font-weight:600; box-shadow:var(--shadow-md); z-index:9999; transform:translateY(80px); opacity:0; transition:transform 0.3s,opacity 0.3s; pointer-events:none; }
+        #toast.show { transform:translateY(0); opacity:1; }
+        ::-webkit-scrollbar { width:6px; height:6px; }
+        ::-webkit-scrollbar-thumb { background:#ccc; border-radius:3px; }
     </style>
 </head>
 <body>
@@ -265,10 +167,8 @@
     <div class="box">
         <div class="spinner"></div>
         <div class="loading-title">Connexion en cours…</div>
-        <div class="loading-sub">Synchronisation avec la base de données</div>
-        <div class="loading-error" id="loading-error">
-            ❌ Impossible de contacter Firebase.<br>Vérifiez votre connexion internet.
-        </div>
+        <div class="loading-sub">Synchronisation avec Firebase</div>
+        <div class="loading-error" id="loading-error">❌ Impossible de contacter Firebase.<br>Vérifiez votre connexion internet.</div>
         <button class="loading-retry" id="loading-retry" onclick="location.reload()">🔄 Réessayer</button>
     </div>
 </div>
@@ -279,7 +179,11 @@
         <div class="header-left">
             <button class="btn-add"    onclick="openTaskForm()">➕ Nouvelle Tâche</button>
             <button class="btn-actors" onclick="openActorsModal()">👥 Acteurs</button>
+            <button class="btn-themes" onclick="openThemesModal()">🎨 Thèmes</button>
             <button class="btn-export" onclick="exportCSV()">📊 Export CSV</button>
+            <button class="btn-backup" onclick="exportJSON()">💾 Backup JSON</button>
+            <button class="btn-import" onclick="document.getElementById('importFile').click()">📂 Importer JSON</button>
+            <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
             <button class="btn-sort"   onclick="sortTasks()">🔃 Trier</button>
             <button class="btn-misc"   onclick="openMiscModal()" id="miscBtn">📝 Infos diverses<span class="misc-date" id="miscDateLabel"></span></button>
             <button class="btn-logout" onclick="logout()" title="Se déconnecter">🚪</button>
@@ -293,21 +197,23 @@
 
     <div id="kanban">
         <div class="column" id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
-            <h2>À traiter / À venir<br><span class="col-sub">informations, rendez-vous, actions à préparer <span class="col-count" id="cnt-todo">0</span></span></h2>
+            <h2>⚡ Cette semaine<br><span class="col-sub">évènements, échéances, rendez-vous… <span class="col-count" id="cnt-todo">0</span></span></h2>
             <div class="task-list"></div>
         </div>
         <div class="column" id="doing" ondrop="drop(event)" ondragover="allowDrop(event)">
-            <h2>En cours<br><span class="col-sub">sujets actifs à inscrire à l'ordre du jour <span class="col-count" id="cnt-doing">0</span></span></h2>
+            <h2>📋 Prochaines semaines<br><span class="col-sub">points prévus à l'avance à préparer <span class="col-count" id="cnt-doing">0</span></span></h2>
             <div class="task-list"></div>
         </div>
         <div class="column" id="done" ondrop="drop(event)" ondragover="allowDrop(event)">
-            <h2>Réalisé / Structurant<br><span class="col-sub">sujets finalisés ou de transformation durable <span class="col-count" id="cnt-done">0</span></span></h2>
+            <h2>🏆 Sujets importants<br><span class="col-sub">sujets structurants / transformation durable <span class="col-count" id="cnt-done">0</span></span></h2>
             <div class="task-list"></div>
         </div>
     </div>
 
     <div id="archives-section">
-        <h3 onclick="toggleArchives()">📦 Archives <span id="arch-count"></span>▾</h3>
+        <h3 onclick="toggleArchives()">📦 Archives <span id="arch-count"></span>▾
+            <small style="font-weight:400;margin-left:8px;">— archivage automatique activé dès dépassement de la date de fin</small>
+        </h3>
         <div id="archives-content" style="display:none;"></div>
     </div>
 </div>
@@ -319,13 +225,7 @@
         <input type="hidden" id="taskId">
         <div class="form-group">
             <label>Thématique</label>
-            <select id="theme">
-                <option value="animation">🎭 Animation</option>
-                <option value="efficience">⚡ Efficience</option>
-                <option value="interne">🏢 Interne</option>
-                <option value="outils">🔧 Outils</option>
-                <option value="performance">📊 Performance</option>
-            </select>
+            <select id="theme"></select>
         </div>
         <div class="form-group">
             <label>Titre</label>
@@ -357,9 +257,9 @@
             <div class="form-group">
                 <label>Colonne</label>
                 <select id="status">
-                    <option value="todo">À traiter / À venir</option>
-                    <option value="doing">En cours</option>
-                    <option value="done">Réalisé / Structurant</option>
+                    <option value="todo">⚡ Cette semaine</option>
+                    <option value="doing">📋 Prochaines semaines</option>
+                    <option value="done">🏆 Sujets importants</option>
                 </select>
             </div>
         </div>
@@ -378,14 +278,26 @@
 <div id="actorsOverlay" class="overlay">
     <div class="modal">
         <h3>👥 Gestion des Acteurs</h3>
-        <div style="display:flex; gap:8px;">
+        <div style="display:flex;gap:8px;">
             <input type="text" id="newActorName" placeholder="Nouvel acteur..." style="flex:1;">
-            <button onclick="addActorToList()" style="background:#3498db; white-space:nowrap;">+ Ajouter</button>
+            <button onclick="addActorToList()" style="background:#3498db;white-space:nowrap;">+ Ajouter</button>
         </div>
-        <div id="globalActorsList" style="margin-top:14px; max-height:220px; overflow-y:auto; border-top:1px solid #eee;"></div>
-        <div class="modal-actions">
-            <button onclick="closeActorsModal()" style="background:#7f8c8d;">Fermer</button>
+        <div id="globalActorsList" style="margin-top:14px;max-height:260px;overflow-y:auto;border-top:1px solid #eee;"></div>
+        <div class="modal-actions"><button onclick="closeActorsModal()" style="background:#7f8c8d;">Fermer</button></div>
+    </div>
+</div>
+
+<!-- ═══ MODALE THÈMES ═══ -->
+<div id="themesOverlay" class="overlay">
+    <div class="modal" style="max-width:460px;">
+        <h3>🎨 Gestion des Thèmes</h3>
+        <div id="themesList" style="max-height:300px;overflow-y:auto;border:1px solid #eee;border-radius:8px;"></div>
+        <div class="new-theme-row">
+            <input type="color" id="newThemeColor" value="#3498db" title="Couleur">
+            <input type="text"  id="newThemeLabel" placeholder="Nom du nouveau thème..." style="flex:1;">
+            <button onclick="addTheme()" style="background:#8e44ad;white-space:nowrap;">+ Ajouter</button>
         </div>
+        <div class="modal-actions"><button onclick="closeThemesModal()" style="background:#7f8c8d;">Fermer</button></div>
     </div>
 </div>
 
@@ -426,15 +338,22 @@
     window.APP_PASSWORD_HASH = "342edb77c95f94da5f1c2e5a397d5467ba9e09b141e69dfa182cb243cb5b3b32";
     window._tasks         = [];
     window._actors        = [];
+    window._themes        = [];   // [{key,label,color}]
     window._fbSet         = null;
     window._firstSyncDone = false;
     window._miscText      = "";
     window._miscLastDate  = "";
     window._codirDate     = "";
 
-    // Données initiales issues de l'export CSV
-    window._DEFAULT_TASKS = [{"id": "id_1770624225608", "theme": "animation", "title": "Feuille de route gouvernance", "desc": "Lab d'Auvergne - Rhône-Alpes", "status": "todo", "priority": "Normale", "start": "2026-02-18", "end": "2026-02-18", "actors": ["Denis", "Michel Ciocci", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771834077619", "theme": "animation", "title": "Séminaire Partenariats NAQ (interne FT) - Efficience et impact", "desc": "1/2 journée de travail \"Concevoir une action à impact sur son territoire\" autour de \"Comment améliorer durablement le retour à l'emploi des DE BOE\" - intervention sur efficience et impact Nadège", "status": "todo", "priority": "Normale", "start": "2026-02-24", "end": "2026-02-24", "actors": ["Nadège", "Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786737955", "theme": "animation", "title": "Audio pilotage", "desc": "Sujet Présentation MEE. Annonce date boot camp. Prez Share point. Autre sujets? (Suggestion NM : Réflexes de l'efficience - pilotage par l'impact ?)", "status": "todo", "priority": "Normale", "start": "2026-02-26", "end": "2026-02-26", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771785898427", "theme": "animation", "title": "Flash DRAO du 02 03", "desc": "Présentation FTAE par NAQ et Share point avec Halima + Reflexe de l'efficience impact?", "status": "todo", "priority": "Normale", "start": "2026-03-02", "end": "2026-03-02", "actors": ["Nicolas", "Arnaud", "Mike", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771177827591", "theme": "animation", "title": "Finalisation café de la perf formation", "desc": "Filage prévu jeudi. Viser des supports finalisé à cette date.", "status": "todo", "priority": "Normale", "start": "2026-02-23", "end": "2026-03-06", "actors": [], "url": "", "archived": true, "comments": ["Préparer / reprndre  les éléments d'analayse en prévision du 11 mars. Message impact (avec exemple sur la formation). Impact formation par public, lien TAE Fprio. Présentaion outils (priorisation et Tb FTAE)"], "lastMod": 0}, {"id": "id_1772297423300", "theme": "animation", "title": "Webinaire évolutions du tableau de bord RPE", "desc": "De 14:00 à 14:45 ouvert à tous.\nInvitation communauté Resana", "status": "todo", "priority": "Normale", "start": "2026-03-06", "end": "2026-03-06", "actors": ["Denis"], "url": "https://teams.microsoft.com/meet/31765579574718?p=Seys8M7WKGdnfULACJ", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773043462439", "theme": "animation", "title": "Webinaire public RSA", "desc": "Présentation des évolutions du tableau de bord RPE", "status": "todo", "priority": "Normale", "start": "", "end": "2026-03-09", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772999040112", "theme": "animation", "title": "Café de la perf Formation", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-10", "end": "2026-03-10", "actors": ["Halima", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773151707977", "theme": "animation", "title": "Café de la perf Formation (Copie)", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-10", "end": "2026-03-10", "actors": ["Halima", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773156224088", "theme": "animation", "title": "Café de la perf Formation (Copie) (Copie)", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-10", "end": "2026-03-10", "actors": ["Halima", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227386220", "theme": "animation", "title": "Séminaire Managers ARA (3/03) et DA BFC (12 mars)", "desc": "- Finaliser les supports de présentation", "status": "todo", "priority": "Normale", "start": "2026-03-03", "end": "2026-03-12", "actors": ["Nadège", "Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997036786", "theme": "animation", "title": "Séminaire DA BFC", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-12", "end": "2026-03-12", "actors": ["Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997197913", "theme": "animation", "title": "Séminaire RPE pilotage par l'impact Var et  BFC - 10/03 et 13/03", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-10", "end": "2026-03-13", "actors": ["Nadège", "Sylvie", "Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773572834229", "theme": "animation", "title": "Visio DPSR", "desc": "Intro / CRE / Travaux AFG (présentation AFG) / lancement travaux efficience avec macro chiffrage ETP par thématique.", "status": "todo", "priority": "Normale", "start": "2026-03-18", "end": "2026-03-18", "actors": ["Nathalie", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773647528425", "theme": "animation", "title": "Audio pilotage", "desc": "Sujet à caler. Présentation du support RMD absenteisme,  intervention Alexandre sur mode calcul TAE + cibles prospection.", "status": "todo", "priority": "Normale", "start": "2026-03-19", "end": "2026-03-19", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774246504496", "theme": "animation", "title": "Webinaire commun DGEFP /FT portant notamment sur les comités territoriaux pour l’emploi : démarche sur l’amélioration continue et la feuille de route industrie.", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-26", "end": "2026-03-26", "actors": ["Matthieu", "Denis", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774854432563", "theme": "animation", "title": "Immersion unedic DG", "desc": "Intervention avec M Manotte sur perf par l'impact", "status": "todo", "priority": "Normale", "start": "2026-04-02", "end": "2026-04-02", "actors": ["Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776064718462", "theme": "animation", "title": "Préconisations CLPE - Fiches action", "desc": "Webinaire organisé par la région Occitanie autour des fiches action.", "status": "todo", "priority": "Normale", "start": "2026-04-14", "end": "2026-04-14", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772209797859", "theme": "animation", "title": "Revues d'impact en bilatérale", "desc": "Corse, NAQ, La Réunion, PACA, Normandie, IDF, Guyane, ARA, Occitanie\nSemaine prochaine: PDL, BFC, HDF, Martinique", "status": "todo", "priority": "Haute", "start": "2026-03-05", "end": "2026-04-15", "actors": ["laurence", "Sylvie", "Laurent"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776064800888", "theme": "animation", "title": "Webinaire DGEFP", "desc": "Benjamin Maurice et Thibault Guilluy vous convient à un webinaire commun portant notamment sur les comités territoriaux pour l’emploi : démarche sur l’amélioration continue et la feuille de route industrie.", "status": "todo", "priority": "Normale", "start": "2026-04-15", "end": "2026-04-15", "actors": ["Denis", "Nadège", "Matthieu"], "url": "https://teams.microsoft.com/meet/36328085012253?p=sgBvqBfAK41FIBA01c", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776665096845", "theme": "animation", "title": "Prépa RMD marqueurs du changement pilotage des DR et pouvoir d'agir", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-04-21", "end": "2026-04-24", "actors": ["Nadège", "Nicolas"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771839325491", "theme": "animation", "title": "GT Prise en main du tableau de bord RPE", "desc": "Un groupe de travail associant les régions IDF, AURA, GUA va travailler sur des ateliers de prise en main des tableaux de bord RPE. XP dans les séminaires par l'impact.", "status": "doing", "priority": "Normale", "start": "2026-02-23", "end": "2026-04-30", "actors": ["Denis", "Nadège"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774211072009", "theme": "animation", "title": "Courrier + synthèses revue d'impact + EPA DG DR", "desc": "Envoyer les courriers en PDF à chaque DR puis copie aux DGA. \nIdée, quid de courrier DG > agence qui ont progressé fortement sur des indicateurs objectivables.", "status": "todo", "priority": "Normale", "start": "2026-04-13", "end": "2026-04-30", "actors": ["Laurent", "laurence", "Sylvie", "Nicolas"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771787391645", "theme": "animation", "title": "Café de la perf impact", "desc": "Déroulé et témoignages\nUne agence identifié (Bron). Recherche de un à 2 en plus. Support mis en ligne. \nQuid d'un after ou pas? Décision vendredi. \nPiste : faire que les régions prennent la gestion de cet after?", "status": "doing", "priority": "Normale", "start": "2026-05-05", "end": "2026-05-05", "actors": ["Nadège", "Sylvie", "Laurent", "Nicolas", "Matthieu", "Laurence"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771787149444", "theme": "animation", "title": "Efficience plateformes - préparation séminaire DPSR avec DG et DGA", "desc": "Etat des lieux enquête ETP des plateformes (échéance 17 avril)", "status": "doing", "priority": "Normale", "start": "2026-05-06", "end": "2026-05-06", "actors": [], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771227435933", "theme": "animation", "title": "Séminaire RPE pilotage par l'impact - 10 mars (Var) et 13 mars (Dijon)", "desc": "Préparation études de cas en cours", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Sylvie"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210851780", "theme": "animation", "title": "Horizon managers", "desc": "Présentation + Atelier", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Matthieu", "Nadège", "Halima", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210671612", "theme": "animation", "title": "Commission indicateurs CNE", "desc": "Mercredi", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["denis", "Matthieu", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774852906698", "theme": "animation", "title": "Séminaires RPE - Carcassonne et Nevers", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Denis", "Laurent"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776669542177", "theme": "animation", "title": "Séminaire RPE - Chardonnay 71 BFC", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Sylvie"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771227269921", "theme": "efficience", "title": "Flux entrées/sorties FS par région en 2025", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-16", "end": "2026-03-20", "actors": ["Dorothée"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786446716", "theme": "efficience", "title": "Boot camp \"communauté pilotage\"", "desc": "Préparer boot camp avec accademie FT, Nicolas Halima Christine.", "status": "doing", "priority": "Normale", "start": "2026-02-23", "end": "2026-04-09", "actors": ["Nicolas", "Halima"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776018775426", "theme": "efficience", "title": "Animation communauté", "desc": "Donner suite boot camp : orga roupe de travail. Adapattion ODJ audio pilotage. Prépa carto des compétence. pousser rapidement des QW (canaux teams...).", "status": "todo", "priority": "Normale", "start": "2026-04-13", "end": "2026-04-17", "actors": ["Nicolas", "Halima"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227689452", "theme": "efficience", "title": "TDB ETP et portefeuilles", "desc": "Le sujet avance avec l'appui des équipe cap.", "status": "doing", "priority": "Haute", "start": "2026-04-20", "end": "2026-05-15", "actors": ["Dorothée", "Emmanuel"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1776019203903", "theme": "efficience", "title": "Chantier plateforme", "desc": "Poser le cadre, aligner FTS Dir perf, DGA OP. Analyser retour carto ETP. Préparer sémainire du 6 mai.", "status": "done", "priority": "Normale", "start": "2026-04-13", "end": "2026-05-30", "actors": ["Nicolas", "Dorothée"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771227726342", "theme": "efficience", "title": "Business Plan FT", "desc": "Commencer à écrire le narratif ; \nRDV DG ADF Cette semaine - logique d'invest social :  Comment les actions de FT vont permettre des économies à 5 ans. Lien CD : impact + de l'acco des RSA.", "status": "done", "priority": "Normale", "start": "", "end": "", "actors": ["Matthieu", "Nadège"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774211034283", "theme": "efficience", "title": "V0 Trajectoire CRE", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210727452", "theme": "efficience", "title": "Déjeuner Philippe Hedde", "desc": "Jeudi", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Dorothée"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774212502222", "theme": "efficience", "title": "Préparer tableau de synthèse des CDD pour 2026 par région (demande CSEC)", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Dorothée"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786639107", "theme": "interne", "title": "Pot de départ de Cécile", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-02-24", "end": "2026-02-24", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786803915", "theme": "interne", "title": "Flash dir perf de ce vendredi", "desc": "Quels sujets ? Prez Share point? Point communauté? (Suites charte ?)", "status": "todo", "priority": "Normale", "start": "2026-02-27", "end": "2026-02-27", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772297165889", "theme": "interne", "title": "Micro formation - Racontez une histoire avec l'IA", "desc": "De 11:00 à 12:00", "status": "todo", "priority": "Normale", "start": "2026-03-03", "end": "2026-03-03", "actors": ["Denis"], "url": "https://teams.microsoft.com/meet/35601878163717?p=lmF2gRz0CqAewYBTcF", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997157023", "theme": "interne", "title": "Séminaire DRAO - organisation services pilotage", "desc": "Arbitrage sujet rattachement CMDD", "status": "todo", "priority": "Normale", "start": "2026-03-11", "end": "2026-03-11", "actors": ["Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772999157464", "theme": "interne", "title": "petit dej dir perf", "desc": "Présence DGA tech, + quels sujets", "status": "todo", "priority": "Normale", "start": "2026-03-12", "end": "2026-03-12", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772209561203", "theme": "interne", "title": "Journée d'accueil DGA tech", "desc": "Venue DGA tech : 12 mars : -\tPoint réorg très rapide DGA TECH et P&S\n-\tPartager la vision et roadmap aux travers de sujets actuels\no\tSophie !\no\tNMA (nouvelles MSA)\no\tPlateforme Data et outils BI\n-\tMieux suivre nos sujets, actions et mieux s’informer \n\n•\t23 avril\n•\t14 mai\n•\t25 juin", "status": "todo", "priority": "Normale", "start": "2026-03-12", "end": "2026-03-12", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772398951120", "theme": "interne", "title": "Traitement des remontées des services pilotage régions", "desc": "Quelle répartition entre les 3 activités ? Quelle évolution des ETP en DR depuis un an ?", "status": "todo", "priority": "Normale", "start": "2026-03-12", "end": "2026-03-13", "actors": ["Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786881635", "theme": "interne", "title": "Suite candidature Ivana Terlevic", "desc": "", "status": "done", "priority": "Normale", "start": "2026-02-23", "end": "2026-03-14", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773573546079", "theme": "interne", "title": "Soutenance Dorothée LEAN", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-19", "end": "2026-03-19", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774629950931", "theme": "interne", "title": "Annonce nomination Mike et Stéphanie", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-30", "end": "2026-03-30", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774629977563", "theme": "interne", "title": "Pot Arnaud", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-31", "end": "2026-03-31", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773911611462", "theme": "interne", "title": "Audio pilotage", "desc": "Appro pilotage par l'impact et acco intensif (ciblage)", "status": "todo", "priority": "Normale", "start": "2026-04-02", "end": "2026-04-02", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773573696968", "theme": "interne", "title": "Accueil Imersion O Laux (Occ ) et P Marchand (CVL) à la dir perf", "desc": "Mardi après midi à la Dir perf, Mercredi Dir perf ou DQS, et Jeudi Dir perf (boot camp)", "status": "doing", "priority": "Normale", "start": "2026-04-07", "end": "2026-04-10", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771948296600", "theme": "interne", "title": "EPA", "desc": "", "status": "doing", "priority": "Normale", "start": "", "end": "2026-04-30", "actors": ["Matthieu", "Nicolas", "Arnaud", "Dorothée", "Mike"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773573070076", "theme": "interne", "title": "Codire avec la DGA tech", "desc": "Suivi des action engagée avec la DGA tech lors du Codir. Partager les actions via nouvel outil similaire à celui du Codir flah (Denis). Adapter les participants aux thématiques (très technique)", "status": "done", "priority": "Normale", "start": "2026-03-12", "end": "2026-06-30", "actors": ["Nicolas", "Denis"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771178013471", "theme": "interne", "title": "Accueil immersion accompagnement collègues réseau", "desc": "", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Nicolas", "alexandre"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774629903019", "theme": "interne", "title": "Datse gouvernance direction", "desc": "•\tPetit-déjeuner : mardi 19 mai \n•\tRéunion de direction :  sur la ½ journée. Le jeudi 16 avril matin A confirmer?\n•\tSéminaire fin 1er semestre mardi 30 juin", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210901168", "theme": "interne", "title": "Pot de départ Nathalie Siprès", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210974946", "theme": "interne", "title": "Flash Dir Perf", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Nicolas", "Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1769680407539", "theme": "outils", "title": "Webinaire évolutions du tableau de bord RPE", "desc": "De 14h00 à 14h45, lien de la visio proposée à la communauté Resana TdB RPE", "status": "todo", "priority": "Normale", "start": "2026-02-06", "end": "2026-02-06", "actors": ["Denis"], "url": "https://tinyurl.com/RPEFEB", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227221320", "theme": "outils", "title": "COPIL outils", "desc": "Focus IOP Sel po à confirmer", "status": "doing", "priority": "Normale", "start": "2026-03-23", "end": "2026-02-23", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774246299376", "theme": "outils", "title": "RSA et formation webinaire TDB RPE", "desc": "Intervention webinaire hebdomadaire DGEFP/CD/FT", "status": "todo", "priority": "Normale", "start": "2026-03-23", "end": "2026-03-23", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774246350220", "theme": "outils", "title": "Webinaire correspondants EPA", "desc": "Présentation du tableau de bord RPE", "status": "todo", "priority": "Normale", "start": "2026-03-23", "end": "2026-03-23", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1770624137145", "theme": "outils", "title": "Tdb RPE - Territoires comparables", "desc": "Livraison des évolutions possible dès le mois de février.\nAmélioration sur la page Analyse par public sur mars.", "status": "doing", "priority": "Normale", "start": "2026-02-09", "end": "2026-03-31", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774855829146", "theme": "outils", "title": "Webinaire de présentation TDB RPE", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-04-02", "end": "2026-04-02", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774855225151", "theme": "outils", "title": "PIP planning de printemps hybride", "desc": "Distance / Présence selon les équipes", "status": "todo", "priority": "Normale", "start": "2026-03-30", "end": "2026-04-03", "actors": ["Denis", "Arnaud", "Franck", "Guillaume", "Olivier"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772209411971", "theme": "outils", "title": "Finaliser les périmètre Produits de la direction", "desc": "Suite à la journée du 12 01, finaliser notre vision des produites de la direction", "status": "done", "priority": "Normale", "start": "2026-01-12", "end": "2026-04-30", "actors": [], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1770624334433", "theme": "outils", "title": "Tableau de bord RPE - Indicateurs spécifiques", "desc": "Possibilité de définir des indicateurs spécifiques à chaque territoire via un catalogue ou en saisie libre.", "status": "done", "priority": "Normale", "start": "", "end": "2026-04-30", "actors": ["Denis"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1773043755085", "theme": "outils", "title": "Simulateur d'impact / ROI", "desc": "Test d'un outil en ligne", "status": "doing", "priority": "Normale", "start": "", "end": "2026-04-30", "actors": ["Denis", "Alexandre"], "url": "https://reseau-pour-l-emploi.github.io/simulateur_roi/", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1776018855706", "theme": "outils", "title": "Avancer sur rationalisation des outils.", "desc": "Mise à dispo organisée des PWBI. Trajectoire P2A IOP AetP vs Sophie notamment.", "status": "done", "priority": "Normale", "start": "", "end": "", "actors": [], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1770580969658", "theme": "performance", "title": "Indemnisation - TP, recouvrement et PPA", "desc": "- Simulations sur PPA et modifications de la QS", "status": "todo", "priority": "Haute", "start": "2026-02-16", "end": "2026-02-20", "actors": ["Mike"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1770581039601", "theme": "performance", "title": "Sujet en Flash DRAO de ce lundi", "desc": "HDF présente MEE, Passer message sur MAJ Opéra, qques mots sur Reflexe de l'efficience (+ annonce café de la perf Impact du 05/05 ?)", "status": "todo", "priority": "Normale", "start": "2026-02-23", "end": "2026-02-23", "actors": ["Nicolas", "Arnaud", "Dorothée"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227110877", "theme": "performance", "title": "RMD négo cibles Matthieu à Distance", "desc": "Présentation des 5 scénarios\nPossible Négo dans les 12h00 en suivant", "status": "todo", "priority": "Haute", "start": "2026-02-24", "end": "2026-02-24", "actors": ["Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771785829891", "theme": "performance", "title": "Instance CA présentation cible", "desc": "Jeudi après midi présentation en CA des cibles", "status": "todo", "priority": "Normale", "start": "2026-02-26", "end": "2026-02-26", "actors": ["Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772209673587", "theme": "performance", "title": "Cible région. Finalisation des remontées", "desc": "Dead line lundi midi. Analyse en suivant pour passer en visio DG mardi soir", "status": "todo", "priority": "Haute", "start": "2026-03-02", "end": "2026-03-03", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773043569194", "theme": "performance", "title": "Séminaire DARP", "desc": "Participation en tant qu'observateur.\nLes délégués à l’accompagnement des entreprises et des parcours professionnels (DARP)", "status": "todo", "priority": "Normale", "start": "2026-03-11", "end": "2026-03-11", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997248384", "theme": "performance", "title": "TP - constituer infos sur période remise en cause", "desc": "Réunion cab 13/03", "status": "todo", "priority": "Normale", "start": "2026-03-13", "end": "2026-03-13", "actors": ["Mike", "youssef"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772440947150", "theme": "performance", "title": "Copil métiers DIR", "desc": "DIR le 17/03 / Support partagé \nDémarche efficience point cock pit / Point CSP / Point TP (à compléter le fichier).", "status": "todo", "priority": "Normale", "start": "2026-03-17", "end": "2026-03-17", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773573197651", "theme": "performance", "title": "Audio Alerte pilotage", "desc": "Première audio Alerte pilotage avec région en lead : Naq et ARA", "status": "todo", "priority": "Normale", "start": "2026-03-18", "end": "2026-03-18", "actors": ["Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997288814", "theme": "performance", "title": "RMD", "desc": "Absentéisme et ciblage acco intensif / Arbitrage rattachement CMDD", "status": "todo", "priority": "Haute", "start": "2026-03-19", "end": "2026-03-19", "actors": ["Alexandre", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776066153781", "theme": "performance", "title": "TP hors fraude", "desc": "Communication sur les cibles TP hors fraude. Faire un état de la perf sur le 1er semestre.", "status": "todo", "priority": "Normale", "start": "2026-04-13", "end": "2026-04-16", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776669483422", "theme": "performance", "title": "Point de suivi LPE - FT/DGEFP", "desc": "Sujet autour des réorientations des DE", "status": "todo", "priority": "Normale", "start": "2026-04-22", "end": "2026-04-22", "actors": ["Mike"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1775978505103", "theme": "performance", "title": "Support CRE + animation RMD", "desc": "Voir avec DADE, DPFCI et Dir gouvernance\nHistoire : en repartant de ce qu'on a fait, comment améliorer encore le CRE. Quelle piste pour fin 2026 avec les nouvelles requêtes ciblées. Quelle horizon 20230 : universalisation du CRE. CRE 360. Meilleur ciblage.", "status": "todo", "priority": "Normale", "start": "2026-04-23", "end": "2026-04-23", "actors": ["Matthieu", "Nadège"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774811596188", "theme": "performance", "title": "Suites du dernier COPIL S3", "desc": "", "status": "doing", "priority": "Normale", "start": "2026-04-20", "end": "2026-05-06", "actors": ["Mike", "Arame", "Elodie"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1775978533848", "theme": "performance", "title": "Support RMD revue 360", "desc": "Indicateurs à compléter puis synthèse et messages clés", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Mike", "Sophie"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774813255980", "theme": "performance", "title": "TDB MEE", "desc": "Y a t il des évolutions en cours ? Les dernières évolutions aident un peu, mais il y encore des marges d'amélioration !", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": [], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1776018999730", "theme": "performance", "title": "Organiser la production de tb et de données par les direction métier et la DGA Tech", "desc": "Multiplicité de tb provenant de différents canaux (DGA tech métier...). A embarquer dans nos codire x DGA tech", "status": "done", "priority": "Normale", "start": "", "end": "", "actors": ["Mike", "alexandre"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774210554163", "theme": "performance", "title": "Suite absentéisme", "desc": "Echange Rosen + suite analyses + pilotage à installer", "status": "done", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Nicolas"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774813729522", "theme": "performance", "title": "Prépa canevas RMD", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Matthieu", "Mike"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772396388284", "theme": "performance", "title": "Support comité de performance", "desc": "", "status": "todo", "priority": "Haute", "start": "", "end": "", "actors": ["Arnaud"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227832642", "theme": "performance", "title": "Ciblage accompagnement intensif + doc RMD", "desc": "- Mesurer la distribution des entrées en intensif en fonction de l'éloignement à l'emploi, par région.", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Alexandre"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772397750913", "theme": "performance", "title": "Doc RMD absentéisme DE", "desc": "", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Nicolas", "Alexandre"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227878299", "theme": "performance", "title": "TDB DYN et FTAE", "desc": "", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Arnaud", "Mike"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210787426", "theme": "performance", "title": "Points de suivi acco intensif + commission inclusion", "desc": "Mercredi et jeudi", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Mike", "Alexandre", "Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210644408", "theme": "performance", "title": "COPIL S3", "desc": "Zoom POEI + AFC", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997104036", "theme": "performance", "title": "Comité de performance - début avril", "desc": "Faire des propositions sur l'indicateur DELD.\nDemandeur leur avis aux stats. Faire des test en lien avec la LPE.", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Arnaud"], "url": "", "archived": true, "comments": [], "lastMod": 0}];
+    window._DEFAULT_TASKS  = [{"id": "id_1770624225608", "theme": "animation", "title": "Feuille de route gouvernance", "desc": "Lab d'Auvergne - Rhône-Alpes", "status": "todo", "priority": "Normale", "start": "2026-02-18", "end": "2026-02-18", "actors": ["Denis", "Michel Ciocci", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771834077619", "theme": "animation", "title": "Séminaire Partenariats NAQ (interne FT) - Efficience et impact", "desc": "1/2 journée de travail \"Concevoir une action à impact sur son territoire\" autour de \"Comment améliorer durablement le retour à l'emploi des DE BOE\" - intervention sur efficience et impact Nadège", "status": "todo", "priority": "Normale", "start": "2026-02-24", "end": "2026-02-24", "actors": ["Nadège", "Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786737955", "theme": "animation", "title": "Audio pilotage", "desc": "Sujet Présentation MEE. Annonce date boot camp. Prez Share point. Autre sujets? (Suggestion NM : Réflexes de l'efficience - pilotage par l'impact ?)", "status": "todo", "priority": "Normale", "start": "2026-02-26", "end": "2026-02-26", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771785898427", "theme": "animation", "title": "Flash DRAO du 02 03", "desc": "Présentation FTAE par NAQ et Share point avec Halima + Reflexe de l'efficience impact?", "status": "todo", "priority": "Normale", "start": "2026-03-02", "end": "2026-03-02", "actors": ["Nicolas", "Arnaud", "Mike", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771177827591", "theme": "animation", "title": "Finalisation café de la perf formation", "desc": "Filage prévu jeudi. Viser des supports finalisé à cette date.", "status": "todo", "priority": "Normale", "start": "2026-02-23", "end": "2026-03-06", "actors": [], "url": "", "archived": true, "comments": ["Préparer / reprndre  les éléments d'analayse en prévision du 11 mars. Message impact (avec exemple sur la formation). Impact formation par public, lien TAE Fprio. Présentaion outils (priorisation et Tb FTAE)"], "lastMod": 0}, {"id": "id_1772297423300", "theme": "animation", "title": "Webinaire évolutions du tableau de bord RPE", "desc": "De 14:00 à 14:45 ouvert à tous.\nInvitation communauté Resana", "status": "todo", "priority": "Normale", "start": "2026-03-06", "end": "2026-03-06", "actors": ["Denis"], "url": "https://teams.microsoft.com/meet/31765579574718?p=Seys8M7WKGdnfULACJ", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773043462439", "theme": "animation", "title": "Webinaire public RSA", "desc": "Présentation des évolutions du tableau de bord RPE", "status": "todo", "priority": "Normale", "start": "", "end": "2026-03-09", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772999040112", "theme": "animation", "title": "Café de la perf Formation", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-10", "end": "2026-03-10", "actors": ["Halima", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773151707977", "theme": "animation", "title": "Café de la perf Formation (Copie)", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-10", "end": "2026-03-10", "actors": ["Halima", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773156224088", "theme": "animation", "title": "Café de la perf Formation (Copie) (Copie)", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-10", "end": "2026-03-10", "actors": ["Halima", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227386220", "theme": "animation", "title": "Séminaire Managers ARA (3/03) et DA BFC (12 mars)", "desc": "- Finaliser les supports de présentation", "status": "todo", "priority": "Normale", "start": "2026-03-03", "end": "2026-03-12", "actors": ["Nadège", "Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997036786", "theme": "animation", "title": "Séminaire DA BFC", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-12", "end": "2026-03-12", "actors": ["Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997197913", "theme": "animation", "title": "Séminaire RPE pilotage par l'impact Var et  BFC - 10/03 et 13/03", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-10", "end": "2026-03-13", "actors": ["Nadège", "Sylvie", "Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773572834229", "theme": "animation", "title": "Visio DPSR", "desc": "Intro / CRE / Travaux AFG (présentation AFG) / lancement travaux efficience avec macro chiffrage ETP par thématique.", "status": "todo", "priority": "Normale", "start": "2026-03-18", "end": "2026-03-18", "actors": ["Nathalie", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773647528425", "theme": "animation", "title": "Audio pilotage", "desc": "Sujet à caler. Présentation du support RMD absenteisme,  intervention Alexandre sur mode calcul TAE + cibles prospection.", "status": "todo", "priority": "Normale", "start": "2026-03-19", "end": "2026-03-19", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774246504496", "theme": "animation", "title": "Webinaire commun DGEFP /FT portant notamment sur les comités territoriaux pour l’emploi : démarche sur l’amélioration continue et la feuille de route industrie.", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-26", "end": "2026-03-26", "actors": ["Matthieu", "Denis", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774854432563", "theme": "animation", "title": "Immersion unedic DG", "desc": "Intervention avec M Manotte sur perf par l'impact", "status": "todo", "priority": "Normale", "start": "2026-04-02", "end": "2026-04-02", "actors": ["Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776064718462", "theme": "animation", "title": "Préconisations CLPE - Fiches action", "desc": "Webinaire organisé par la région Occitanie autour des fiches action.", "status": "todo", "priority": "Normale", "start": "2026-04-14", "end": "2026-04-14", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772209797859", "theme": "animation", "title": "Revues d'impact en bilatérale", "desc": "Corse, NAQ, La Réunion, PACA, Normandie, IDF, Guyane, ARA, Occitanie\nSemaine prochaine: PDL, BFC, HDF, Martinique", "status": "todo", "priority": "Haute", "start": "2026-03-05", "end": "2026-04-15", "actors": ["laurence", "Sylvie", "Laurent"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776064800888", "theme": "animation", "title": "Webinaire DGEFP", "desc": "Benjamin Maurice et Thibault Guilluy vous convient à un webinaire commun portant notamment sur les comités territoriaux pour l’emploi : démarche sur l’amélioration continue et la feuille de route industrie.", "status": "todo", "priority": "Normale", "start": "2026-04-15", "end": "2026-04-15", "actors": ["Denis", "Nadège", "Matthieu"], "url": "https://teams.microsoft.com/meet/36328085012253?p=sgBvqBfAK41FIBA01c", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776665096845", "theme": "animation", "title": "Prépa RMD marqueurs du changement pilotage des DR et pouvoir d'agir", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-04-21", "end": "2026-04-24", "actors": ["Nadège", "Nicolas"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771839325491", "theme": "animation", "title": "GT Prise en main du tableau de bord RPE", "desc": "Un groupe de travail associant les régions IDF, AURA, GUA va travailler sur des ateliers de prise en main des tableaux de bord RPE. XP dans les séminaires par l'impact.", "status": "doing", "priority": "Normale", "start": "2026-02-23", "end": "2026-04-30", "actors": ["Denis", "Nadège"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774211072009", "theme": "animation", "title": "Courrier + synthèses revue d'impact + EPA DG DR", "desc": "Envoyer les courriers en PDF à chaque DR puis copie aux DGA. \nIdée, quid de courrier DG > agence qui ont progressé fortement sur des indicateurs objectivables.", "status": "todo", "priority": "Normale", "start": "2026-04-13", "end": "2026-04-30", "actors": ["Laurent", "laurence", "Sylvie", "Nicolas"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771787391645", "theme": "animation", "title": "Café de la perf impact", "desc": "Déroulé et témoignages\nUne agence identifié (Bron). Recherche de un à 2 en plus. Support mis en ligne. \nQuid d'un after ou pas? Décision vendredi. \nPiste : faire que les régions prennent la gestion de cet after?", "status": "doing", "priority": "Normale", "start": "2026-05-05", "end": "2026-05-05", "actors": ["Nadège", "Sylvie", "Laurent", "Nicolas", "Matthieu", "Laurence"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771787149444", "theme": "animation", "title": "Efficience plateformes - préparation séminaire DPSR avec DG et DGA", "desc": "Etat des lieux enquête ETP des plateformes (échéance 17 avril)", "status": "doing", "priority": "Normale", "start": "2026-05-06", "end": "2026-05-06", "actors": [], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771227435933", "theme": "animation", "title": "Séminaire RPE pilotage par l'impact - 10 mars (Var) et 13 mars (Dijon)", "desc": "Préparation études de cas en cours", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Sylvie"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210851780", "theme": "animation", "title": "Horizon managers", "desc": "Présentation + Atelier", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Matthieu", "Nadège", "Halima", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210671612", "theme": "animation", "title": "Commission indicateurs CNE", "desc": "Mercredi", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["denis", "Matthieu", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774852906698", "theme": "animation", "title": "Séminaires RPE - Carcassonne et Nevers", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Denis", "Laurent"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776669542177", "theme": "animation", "title": "Séminaire RPE - Chardonnay 71 BFC", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Sylvie"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771227269921", "theme": "efficience", "title": "Flux entrées/sorties FS par région en 2025", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-16", "end": "2026-03-20", "actors": ["Dorothée"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786446716", "theme": "efficience", "title": "Boot camp \"communauté pilotage\"", "desc": "Préparer boot camp avec accademie FT, Nicolas Halima Christine.", "status": "doing", "priority": "Normale", "start": "2026-02-23", "end": "2026-04-09", "actors": ["Nicolas", "Halima"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776018775426", "theme": "efficience", "title": "Animation communauté", "desc": "Donner suite boot camp : orga roupe de travail. Adapattion ODJ audio pilotage. Prépa carto des compétence. pousser rapidement des QW (canaux teams...).", "status": "todo", "priority": "Normale", "start": "2026-04-13", "end": "2026-04-17", "actors": ["Nicolas", "Halima"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227689452", "theme": "efficience", "title": "TDB ETP et portefeuilles", "desc": "Le sujet avance avec l'appui des équipe cap.", "status": "doing", "priority": "Haute", "start": "2026-04-20", "end": "2026-05-15", "actors": ["Dorothée", "Emmanuel"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1776019203903", "theme": "efficience", "title": "Chantier plateforme", "desc": "Poser le cadre, aligner FTS Dir perf, DGA OP. Analyser retour carto ETP. Préparer sémainire du 6 mai.", "status": "done", "priority": "Normale", "start": "2026-04-13", "end": "2026-05-30", "actors": ["Nicolas", "Dorothée"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771227726342", "theme": "efficience", "title": "Business Plan FT", "desc": "Commencer à écrire le narratif ; \nRDV DG ADF Cette semaine - logique d'invest social :  Comment les actions de FT vont permettre des économies à 5 ans. Lien CD : impact + de l'acco des RSA.", "status": "done", "priority": "Normale", "start": "", "end": "", "actors": ["Matthieu", "Nadège"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774211034283", "theme": "efficience", "title": "V0 Trajectoire CRE", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210727452", "theme": "efficience", "title": "Déjeuner Philippe Hedde", "desc": "Jeudi", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Dorothée"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774212502222", "theme": "efficience", "title": "Préparer tableau de synthèse des CDD pour 2026 par région (demande CSEC)", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Dorothée"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786639107", "theme": "interne", "title": "Pot de départ de Cécile", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-02-24", "end": "2026-02-24", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786803915", "theme": "interne", "title": "Flash dir perf de ce vendredi", "desc": "Quels sujets ? Prez Share point? Point communauté? (Suites charte ?)", "status": "todo", "priority": "Normale", "start": "2026-02-27", "end": "2026-02-27", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772297165889", "theme": "interne", "title": "Micro formation - Racontez une histoire avec l'IA", "desc": "De 11:00 à 12:00", "status": "todo", "priority": "Normale", "start": "2026-03-03", "end": "2026-03-03", "actors": ["Denis"], "url": "https://teams.microsoft.com/meet/35601878163717?p=lmF2gRz0CqAewYBTcF", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997157023", "theme": "interne", "title": "Séminaire DRAO - organisation services pilotage", "desc": "Arbitrage sujet rattachement CMDD", "status": "todo", "priority": "Normale", "start": "2026-03-11", "end": "2026-03-11", "actors": ["Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772999157464", "theme": "interne", "title": "petit dej dir perf", "desc": "Présence DGA tech, + quels sujets", "status": "todo", "priority": "Normale", "start": "2026-03-12", "end": "2026-03-12", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772209561203", "theme": "interne", "title": "Journée d'accueil DGA tech", "desc": "Venue DGA tech : 12 mars : -\tPoint réorg très rapide DGA TECH et P&S\n-\tPartager la vision et roadmap aux travers de sujets actuels\no\tSophie !\no\tNMA (nouvelles MSA)\no\tPlateforme Data et outils BI\n-\tMieux suivre nos sujets, actions et mieux s’informer \n\n•\t23 avril\n•\t14 mai\n•\t25 juin", "status": "todo", "priority": "Normale", "start": "2026-03-12", "end": "2026-03-12", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772398951120", "theme": "interne", "title": "Traitement des remontées des services pilotage régions", "desc": "Quelle répartition entre les 3 activités ? Quelle évolution des ETP en DR depuis un an ?", "status": "todo", "priority": "Normale", "start": "2026-03-12", "end": "2026-03-13", "actors": ["Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786881635", "theme": "interne", "title": "Suite candidature Ivana Terlevic", "desc": "", "status": "done", "priority": "Normale", "start": "2026-02-23", "end": "2026-03-14", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773573546079", "theme": "interne", "title": "Soutenance Dorothée LEAN", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-19", "end": "2026-03-19", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774629950931", "theme": "interne", "title": "Annonce nomination Mike et Stéphanie", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-30", "end": "2026-03-30", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774629977563", "theme": "interne", "title": "Pot Arnaud", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-31", "end": "2026-03-31", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773911611462", "theme": "interne", "title": "Audio pilotage", "desc": "Appro pilotage par l'impact et acco intensif (ciblage)", "status": "todo", "priority": "Normale", "start": "2026-04-02", "end": "2026-04-02", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773573696968", "theme": "interne", "title": "Accueil Imersion O Laux (Occ ) et P Marchand (CVL) à la dir perf", "desc": "Mardi après midi à la Dir perf, Mercredi Dir perf ou DQS, et Jeudi Dir perf (boot camp)", "status": "doing", "priority": "Normale", "start": "2026-04-07", "end": "2026-04-10", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771948296600", "theme": "interne", "title": "EPA", "desc": "", "status": "doing", "priority": "Normale", "start": "", "end": "2026-04-30", "actors": ["Matthieu", "Nicolas", "Arnaud", "Dorothée", "Mike"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773573070076", "theme": "interne", "title": "Codire avec la DGA tech", "desc": "Suivi des action engagée avec la DGA tech lors du Codir. Partager les actions via nouvel outil similaire à celui du Codir flah (Denis). Adapter les participants aux thématiques (très technique)", "status": "done", "priority": "Normale", "start": "2026-03-12", "end": "2026-06-30", "actors": ["Nicolas", "Denis"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771178013471", "theme": "interne", "title": "Accueil immersion accompagnement collègues réseau", "desc": "", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Nicolas", "alexandre"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774629903019", "theme": "interne", "title": "Datse gouvernance direction", "desc": "•\tPetit-déjeuner : mardi 19 mai \n•\tRéunion de direction :  sur la ½ journée. Le jeudi 16 avril matin A confirmer?\n•\tSéminaire fin 1er semestre mardi 30 juin", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210901168", "theme": "interne", "title": "Pot de départ Nathalie Siprès", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210974946", "theme": "interne", "title": "Flash Dir Perf", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Nicolas", "Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1769680407539", "theme": "outils", "title": "Webinaire évolutions du tableau de bord RPE", "desc": "De 14h00 à 14h45, lien de la visio proposée à la communauté Resana TdB RPE", "status": "todo", "priority": "Normale", "start": "2026-02-06", "end": "2026-02-06", "actors": ["Denis"], "url": "https://tinyurl.com/RPEFEB", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227221320", "theme": "outils", "title": "COPIL outils", "desc": "Focus IOP Sel po à confirmer", "status": "doing", "priority": "Normale", "start": "2026-03-23", "end": "2026-02-23", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774246299376", "theme": "outils", "title": "RSA et formation webinaire TDB RPE", "desc": "Intervention webinaire hebdomadaire DGEFP/CD/FT", "status": "todo", "priority": "Normale", "start": "2026-03-23", "end": "2026-03-23", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774246350220", "theme": "outils", "title": "Webinaire correspondants EPA", "desc": "Présentation du tableau de bord RPE", "status": "todo", "priority": "Normale", "start": "2026-03-23", "end": "2026-03-23", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1770624137145", "theme": "outils", "title": "Tdb RPE - Territoires comparables", "desc": "Livraison des évolutions possible dès le mois de février.\nAmélioration sur la page Analyse par public sur mars.", "status": "doing", "priority": "Normale", "start": "2026-02-09", "end": "2026-03-31", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774855829146", "theme": "outils", "title": "Webinaire de présentation TDB RPE", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-04-02", "end": "2026-04-02", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774855225151", "theme": "outils", "title": "PIP planning de printemps hybride", "desc": "Distance / Présence selon les équipes", "status": "todo", "priority": "Normale", "start": "2026-03-30", "end": "2026-04-03", "actors": ["Denis", "Arnaud", "Franck", "Guillaume", "Olivier"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772209411971", "theme": "outils", "title": "Finaliser les périmètre Produits de la direction", "desc": "Suite à la journée du 12 01, finaliser notre vision des produites de la direction", "status": "done", "priority": "Normale", "start": "2026-01-12", "end": "2026-04-30", "actors": [], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1770624334433", "theme": "outils", "title": "Tableau de bord RPE - Indicateurs spécifiques", "desc": "Possibilité de définir des indicateurs spécifiques à chaque territoire via un catalogue ou en saisie libre.", "status": "done", "priority": "Normale", "start": "", "end": "2026-04-30", "actors": ["Denis"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1773043755085", "theme": "outils", "title": "Simulateur d'impact / ROI", "desc": "Test d'un outil en ligne", "status": "doing", "priority": "Normale", "start": "", "end": "2026-04-30", "actors": ["Denis", "Alexandre"], "url": "https://reseau-pour-l-emploi.github.io/simulateur_roi/", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1776018855706", "theme": "outils", "title": "Avancer sur rationalisation des outils.", "desc": "Mise à dispo organisée des PWBI. Trajectoire P2A IOP AetP vs Sophie notamment.", "status": "done", "priority": "Normale", "start": "", "end": "", "actors": [], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1770580969658", "theme": "performance", "title": "Indemnisation - TP, recouvrement et PPA", "desc": "- Simulations sur PPA et modifications de la QS", "status": "todo", "priority": "Haute", "start": "2026-02-16", "end": "2026-02-20", "actors": ["Mike"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1770581039601", "theme": "performance", "title": "Sujet en Flash DRAO de ce lundi", "desc": "HDF présente MEE, Passer message sur MAJ Opéra, qques mots sur Reflexe de l'efficience (+ annonce café de la perf Impact du 05/05 ?)", "status": "todo", "priority": "Normale", "start": "2026-02-23", "end": "2026-02-23", "actors": ["Nicolas", "Arnaud", "Dorothée"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227110877", "theme": "performance", "title": "RMD négo cibles Matthieu à Distance", "desc": "Présentation des 5 scénarios\nPossible Négo dans les 12h00 en suivant", "status": "todo", "priority": "Haute", "start": "2026-02-24", "end": "2026-02-24", "actors": ["Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771785829891", "theme": "performance", "title": "Instance CA présentation cible", "desc": "Jeudi après midi présentation en CA des cibles", "status": "todo", "priority": "Normale", "start": "2026-02-26", "end": "2026-02-26", "actors": ["Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772209673587", "theme": "performance", "title": "Cible région. Finalisation des remontées", "desc": "Dead line lundi midi. Analyse en suivant pour passer en visio DG mardi soir", "status": "todo", "priority": "Haute", "start": "2026-03-02", "end": "2026-03-03", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773043569194", "theme": "performance", "title": "Séminaire DARP", "desc": "Participation en tant qu'observateur.\nLes délégués à l’accompagnement des entreprises et des parcours professionnels (DARP)", "status": "todo", "priority": "Normale", "start": "2026-03-11", "end": "2026-03-11", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997248384", "theme": "performance", "title": "TP - constituer infos sur période remise en cause", "desc": "Réunion cab 13/03", "status": "todo", "priority": "Normale", "start": "2026-03-13", "end": "2026-03-13", "actors": ["Mike", "youssef"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772440947150", "theme": "performance", "title": "Copil métiers DIR", "desc": "DIR le 17/03 / Support partagé \nDémarche efficience point cock pit / Point CSP / Point TP (à compléter le fichier).", "status": "todo", "priority": "Normale", "start": "2026-03-17", "end": "2026-03-17", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773573197651", "theme": "performance", "title": "Audio Alerte pilotage", "desc": "Première audio Alerte pilotage avec région en lead : Naq et ARA", "status": "todo", "priority": "Normale", "start": "2026-03-18", "end": "2026-03-18", "actors": ["Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997288814", "theme": "performance", "title": "RMD", "desc": "Absentéisme et ciblage acco intensif / Arbitrage rattachement CMDD", "status": "todo", "priority": "Haute", "start": "2026-03-19", "end": "2026-03-19", "actors": ["Alexandre", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776066153781", "theme": "performance", "title": "TP hors fraude", "desc": "Communication sur les cibles TP hors fraude. Faire un état de la perf sur le 1er semestre.", "status": "todo", "priority": "Normale", "start": "2026-04-13", "end": "2026-04-16", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776669483422", "theme": "performance", "title": "Point de suivi LPE - FT/DGEFP", "desc": "Sujet autour des réorientations des DE", "status": "todo", "priority": "Normale", "start": "2026-04-22", "end": "2026-04-22", "actors": ["Mike"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1775978505103", "theme": "performance", "title": "Support CRE + animation RMD", "desc": "Voir avec DADE, DPFCI et Dir gouvernance\nHistoire : en repartant de ce qu'on a fait, comment améliorer encore le CRE. Quelle piste pour fin 2026 avec les nouvelles requêtes ciblées. Quelle horizon 20230 : universalisation du CRE. CRE 360. Meilleur ciblage.", "status": "todo", "priority": "Normale", "start": "2026-04-23", "end": "2026-04-23", "actors": ["Matthieu", "Nadège"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774811596188", "theme": "performance", "title": "Suites du dernier COPIL S3", "desc": "", "status": "doing", "priority": "Normale", "start": "2026-04-20", "end": "2026-05-06", "actors": ["Mike", "Arame", "Elodie"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1775978533848", "theme": "performance", "title": "Support RMD revue 360", "desc": "Indicateurs à compléter puis synthèse et messages clés", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Mike", "Sophie"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774813255980", "theme": "performance", "title": "TDB MEE", "desc": "Y a t il des évolutions en cours ? Les dernières évolutions aident un peu, mais il y encore des marges d'amélioration !", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": [], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1776018999730", "theme": "performance", "title": "Organiser la production de tb et de données par les direction métier et la DGA Tech", "desc": "Multiplicité de tb provenant de différents canaux (DGA tech métier...). A embarquer dans nos codire x DGA tech", "status": "done", "priority": "Normale", "start": "", "end": "", "actors": ["Mike", "alexandre"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774210554163", "theme": "performance", "title": "Suite absentéisme", "desc": "Echange Rosen + suite analyses + pilotage à installer", "status": "done", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Nicolas"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774813729522", "theme": "performance", "title": "Prépa canevas RMD", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Matthieu", "Mike"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772396388284", "theme": "performance", "title": "Support comité de performance", "desc": "", "status": "todo", "priority": "Haute", "start": "", "end": "", "actors": ["Arnaud"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227832642", "theme": "performance", "title": "Ciblage accompagnement intensif + doc RMD", "desc": "- Mesurer la distribution des entrées en intensif en fonction de l'éloignement à l'emploi, par région.", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Alexandre"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772397750913", "theme": "performance", "title": "Doc RMD absentéisme DE", "desc": "", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Nicolas", "Alexandre"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227878299", "theme": "performance", "title": "TDB DYN et FTAE", "desc": "", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Arnaud", "Mike"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210787426", "theme": "performance", "title": "Points de suivi acco intensif + commission inclusion", "desc": "Mercredi et jeudi", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Mike", "Alexandre", "Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210644408", "theme": "performance", "title": "COPIL S3", "desc": "Zoom POEI + AFC", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997104036", "theme": "performance", "title": "Comité de performance - début avril", "desc": "Faire des propositions sur l'indicateur DELD.\nDemandeur leur avis aux stats. Faire des test en lien avec la LPE.", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Arnaud"], "url": "", "archived": true, "comments": [], "lastMod": 0}];
     window._DEFAULT_ACTORS = ["Alexandre","Arame","Arnaud","Denis","Dorothée","Elodie","Emmanuel","Franck","Guillaume","Halima","Laurence","Laurent","Matthieu","Michel Ciocci","Mike","Nadège","Nathalie","Nicolas","Olivier","Sophie","Sylvie","Youssef"];
+    window._DEFAULT_THEMES = [
+        {key:"animation",   label:"Animation",   color:"#8e44ad"},
+        {key:"efficience",  label:"Efficience",  color:"#e67e22"},
+        {key:"interne",     label:"Interne",     color:"#34495e"},
+        {key:"outils",      label:"Outils",      color:"#2980b9"},
+        {key:"performance", label:"Performance", color:"#27ae60"}
+    ];
 </script>
 
 <!-- ═══ FIREBASE SDK ═══ -->
@@ -471,20 +390,17 @@
             clearTimeout(loadingTimeout);
             window._firstSyncDone = true;
 
-            // Si Firebase est vide, on charge les données du CSV par défaut
             if (!data.tasks || data.tasks.length === 0) {
+                // Premier démarrage : seed depuis CSV
                 window._tasks  = window._DEFAULT_TASKS.slice();
                 window._actors = window._DEFAULT_ACTORS.slice();
-                window._miscText     = "";
-                window._miscLastDate = "";
-                window._codirDate    = "";
-                // Sauvegarde immédiate du seed dans Firebase
-                setTimeout(function() {
-                    if (window._fbSet) window._fbSet(buildPayload());
-                }, 500);
+                window._themes = window._DEFAULT_THEMES.slice();
+                window._miscText = ""; window._miscLastDate = ""; window._codirDate = "";
+                setTimeout(function(){ if(window._fbSet) window._fbSet(buildPayload()); }, 600);
             } else {
                 window._tasks        = data.tasks  || [];
                 window._actors       = data.actors || [];
+                window._themes       = data.themes && data.themes.length ? data.themes : window._DEFAULT_THEMES.slice();
                 window._miscText     = data.misc   || "";
                 window._miscLastDate = data.miscLastDate || "";
                 window._codirDate    = data.codirDate    || "";
@@ -497,6 +413,7 @@
             if (document.getElementById("taskOverlay").classList.contains("open")) return;
             window._tasks        = data.tasks  || [];
             window._actors       = data.actors || [];
+            window._themes       = data.themes && data.themes.length ? data.themes : window._DEFAULT_THEMES.slice();
             window._miscText     = data.misc   || "";
             window._miscLastDate = data.miscLastDate || "";
             window._codirDate    = data.codirDate    || "";
@@ -505,7 +422,6 @@
             if (typeof window.updateMiscDateLabel === "function") window.updateMiscDateLabel();
             if (typeof window.render === "function") window.render();
         }
-
         setSyncDot("synced", "Synchronisé ✓");
     });
 
@@ -515,87 +431,79 @@
             .then(function()  { setSyncDot("synced",  "Synchronisé ✓"); })
             .catch(function(e){ setSyncDot("error",   "Erreur sync ✗"); console.error(e); });
     };
-
     function setSyncDot(cls, label) {
-        var d = document.getElementById("sync-dot");
-        var l = document.getElementById("sync-label");
-        if (d) d.className = cls;
-        if (l) l.textContent = label;
+        var d=document.getElementById("sync-dot"), l=document.getElementById("sync-label");
+        if(d) d.className=cls; if(l) l.textContent=label;
     }
     window.setSyncStatus = setSyncDot;
-
     window._firebaseReady = true;
     if (typeof window._bootApp === "function") window._bootApp();
 </script>
 
 <!-- ═══ LOGIQUE APP ═══ -->
 <script>
-var themeConfig = {
-    "animation":   { label: "Animation",   color: "#8e44ad" },
-    "efficience":  { label: "Efficience",  color: "#e67e22" },
-    "interne":     { label: "Interne",     color: "#34495e" },
-    "outils":      { label: "Outils",      color: "#2980b9" },
-    "performance": { label: "Performance", color: "#27ae60" }
-};
-var prioEmojis       = { "Haute": "🔴", "Normale": "🟡", "Basse": "🔵" };
+var prioEmojis        = {"Haute":"🔴","Normale":"🟡","Basse":"🔵"};
 var currentTaskActors = [];
 var archivesOpen      = false;
 var _syncTimer        = null;
+
+// ── HELPERS THÈMES ──
+function getThemeConf(key) {
+    var t = (window._themes||[]).find(function(x){ return x.key===key; });
+    return t || {key:key, label:key||"Général", color:"#aaa"};
+}
+function themeColorMap() {
+    var m={};
+    (window._themes||[]).forEach(function(t){ m[t.key]=t; });
+    return m;
+}
 
 // ── AUTH ──
 function checkPassword() {
     var input = document.getElementById("passwordInput").value;
     crypto.subtle.digest('SHA-256', new TextEncoder().encode(input))
         .then(function(buf) {
-            var hash = Array.from(new Uint8Array(buf))
-                           .map(function(b){ return b.toString(16).padStart(2,'0'); })
-                           .join('');
+            var hash = Array.from(new Uint8Array(buf)).map(function(b){ return b.toString(16).padStart(2,'0'); }).join('');
             if (hash === window.APP_PASSWORD_HASH) {
-                sessionStorage.setItem("kanban_auth", "ok");
+                sessionStorage.setItem("kanban_auth","ok");
                 document.getElementById("login-screen").style.display  = "none";
                 document.getElementById("loading-screen").style.display = "flex";
                 if (window._firebaseReady && window._firstSyncDone) {
-                    document.getElementById("loading-screen").style.display = "none";
-                    document.getElementById("app").style.display = "block";
+                    document.getElementById("loading-screen").style.display="none";
+                    document.getElementById("app").style.display="block";
                     initApp();
                 }
             } else {
-                document.getElementById("login-error").textContent = "❌ Mot de passe incorrect";
-                document.getElementById("passwordInput").value = "";
+                document.getElementById("login-error").textContent="❌ Mot de passe incorrect";
+                document.getElementById("passwordInput").value="";
             }
         });
 }
-
 function logout() {
-    if (confirm("Se déconnecter ?")) {
-        sessionStorage.removeItem("kanban_auth");
-        location.reload();
-    }
+    if(confirm("Se déconnecter ?")){ sessionStorage.removeItem("kanban_auth"); location.reload(); }
 }
-
 window._bootApp = function() {
-    if (sessionStorage.getItem("kanban_auth") === "ok") {
-        document.getElementById("login-screen").style.display   = "none";
-        document.getElementById("loading-screen").style.display = "flex";
+    if(sessionStorage.getItem("kanban_auth")==="ok"){
+        document.getElementById("login-screen").style.display="none";
+        document.getElementById("loading-screen").style.display="flex";
     }
 };
-
 window.initApp = function() {
     checkAutoArchive();
     updateActorsDatalist();
-    var cd = document.getElementById("codirDate");
-    if (cd && window._codirDate) cd.value = window._codirDate;
+    updateThemeSelect();
+    var cd=document.getElementById("codirDate");
+    if(cd && window._codirDate) cd.value=window._codirDate;
     updateMiscDateLabel();
     render();
 };
-
 window.onload = function() {
-    if (sessionStorage.getItem("kanban_auth") === "ok") {
-        document.getElementById("login-screen").style.display   = "none";
-        document.getElementById("loading-screen").style.display = "flex";
-        if (window._firebaseReady && window._firstSyncDone) {
-            document.getElementById("loading-screen").style.display = "none";
-            document.getElementById("app").style.display = "block";
+    if(sessionStorage.getItem("kanban_auth")==="ok"){
+        document.getElementById("login-screen").style.display="none";
+        document.getElementById("loading-screen").style.display="flex";
+        if(window._firebaseReady && window._firstSyncDone){
+            document.getElementById("loading-screen").style.display="none";
+            document.getElementById("app").style.display="block";
             initApp();
         }
     }
@@ -606,59 +514,56 @@ function buildPayload() {
     return {
         tasks:        window._tasks,
         actors:       window._actors,
+        themes:       window._themes,
         misc:         window._miscText     || "",
         miscLastDate: window._miscLastDate || "",
-        codirDate:    (document.getElementById("codirDate") ? document.getElementById("codirDate").value : "") || window._codirDate || ""
+        codirDate:    (document.getElementById("codirDate")?document.getElementById("codirDate").value:"")||window._codirDate||""
     };
 }
 function saveData() {
-    var payload = buildPayload();
-    try { localStorage.setItem("kanban_data", JSON.stringify(payload)); } catch(e) {}
-    if (window._fbSet) window._fbSet(payload);
+    var p=buildPayload();
+    try{ localStorage.setItem("kanban_data",JSON.stringify(p)); }catch(e){}
+    if(window._fbSet) window._fbSet(p);
 }
-function scheduleSync() { clearTimeout(_syncTimer); _syncTimer = setTimeout(saveData, 800); }
+function scheduleSync(){ clearTimeout(_syncTimer); _syncTimer=setTimeout(saveData,800); }
 
-// ── ARCHIVAGE AUTO ──
+// ── ARCHIVAGE AUTO (actif dès dépassement de la date de fin) ──
 function checkAutoArchive() {
-    var d = new Date(); d.setHours(0,0,0,0);
-    var changed = false;
-    window._tasks.forEach(function(t) {
-        if (t.end && !t.archived && new Date(t.end) < d) { t.archived = true; t.lastMod = Date.now(); changed = true; }
+    var d=new Date(); d.setHours(0,0,0,0);
+    var changed=false;
+    window._tasks.forEach(function(t){
+        if(t.end && !t.archived && new Date(t.end)<d){ t.archived=true; t.lastMod=Date.now(); changed=true; }
     });
-    if (changed) saveData();
+    if(changed) saveData();
 }
 
 // ── RENDU ──
 function render() {
-    window.render = render;
-    var cols = {
-        todo:  document.querySelector("#todo  .task-list"),
-        doing: document.querySelector("#doing .task-list"),
-        done:  document.querySelector("#done  .task-list")
-    };
-    if (!cols.todo) return;
-    var arch = document.getElementById("archives-content");
-    Object.keys(cols).forEach(function(k){ cols[k].innerHTML = ""; });
-    arch.innerHTML = "";
-    var counts = { todo:0, doing:0, done:0, arch:0 };
+    window.render=render;
+    var cols={todo:document.querySelector("#todo .task-list"),doing:document.querySelector("#doing .task-list"),done:document.querySelector("#done .task-list")};
+    if(!cols.todo) return;
+    var arch=document.getElementById("archives-content");
+    Object.keys(cols).forEach(function(k){ cols[k].innerHTML=""; });
+    arch.innerHTML="";
+    var counts={todo:0,doing:0,done:0,arch:0};
 
-    window._tasks.forEach(function(t) {
-        var conf = themeConfig[t.theme] || { color:"#ccc", label:"Général" };
-        var div  = document.createElement("div");
-        div.className = "task" + (t.archived ? " archived" : "");
-        div.style.borderLeftColor = conf.color;
-        div.draggable = !t.archived;
-        div.id = t.id;
-        div.ondragstart = (function(tid){ return function(e){ e.dataTransfer.setData("text",tid); div.classList.add('dragging'); }; })(t.id);
-        div.ondragend   = function(){ div.classList.remove('dragging'); };
+    window._tasks.forEach(function(t){
+        var conf=getThemeConf(t.theme);
+        var div=document.createElement("div");
+        div.className="task"+(t.archived?" archived":"");
+        div.style.borderLeftColor=conf.color;
+        div.draggable=!t.archived;
+        div.id=t.id;
+        div.ondragstart=(function(tid){ return function(e){ e.dataTransfer.setData("text",tid); div.classList.add('dragging'); }; })(t.id);
+        div.ondragend=function(){ div.classList.remove('dragging'); };
 
-        var now = new Date(); now.setHours(0,0,0,0);
-        var overdue = t.end && !t.archived && new Date(t.end) < now;
-        var modDate = t.lastMod ? new Date(t.lastMod).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '--/--';
-        var dateStr = (t.start||t.end) ? '<div class="task-dates'+(overdue?' overdue':'')+'">📅 '+fmt(t.start)+' → '+fmt(t.end)+(overdue?' ⚠️':'')+'</div>' : '';
-        var urlStr  = t.url ? '<a href="'+t.url+'" target="_blank" class="task-url">🔗 '+t.url+'</a>' : '';
+        var now=new Date(); now.setHours(0,0,0,0);
+        var overdue=t.end && !t.archived && new Date(t.end)<now;
+        var modDate=t.lastMod?new Date(t.lastMod).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}):'--/--';
+        var dateStr=(t.start||t.end)?'<div class="task-dates'+(overdue?' overdue':'')+'">📅 '+fmt(t.start)+' → '+fmt(t.end)+(overdue?' ⚠️':'')+'</div>':'';
+        var urlStr=t.url?'<a href="'+t.url+'" target="_blank" class="task-url">🔗 '+t.url+'</a>':'';
 
-        div.innerHTML =
+        div.innerHTML=
             '<div class="last-mod">'+modDate+'</div>'+
             '<span class="tag-theme" style="background:'+conf.color+'">'+conf.label+'</span>'+
             '<b class="task-title"><span class="priority-dot">'+(prioEmojis[t.priority]||"🟡")+'</span>'+esc(t.title)+'</b>'+
@@ -667,35 +572,34 @@ function render() {
             '<div style="margin:4px 0;">'+(t.actors||[]).map(function(a){ return '<span class="actor-label">'+esc(a)+'</span>'; }).join('')+'</div>'+
             urlStr+
             '<div>'+(t.comments||[]).map(function(c,i){
-                return '<div class="comment-box"><span>'+esc(c)+'</span><span class="del-com" onclick="deleteComment(\''+t.id+'\','+i+')">×</span></div>';
+                return '<div class="comment-box"><span>'+esc(c)+'</span><span class="del-com" onclick="deleteComment(''+t.id+'','+i+')">×</span></div>';
             }).join('')+'</div>'+
             '<div class="task-actions">'+
-                '<button onclick="addComment(\''+t.id+'\')"    style="background:#2ecc71;">💬</button>'+
-                '<button onclick="editTask(\''+t.id+'\')"      style="background:#f39c12;">✎</button>'+
-                '<button onclick="duplicateTask(\''+t.id+'\')" style="background:#3498db;">📄</button>'+
-                '<button onclick="archiveTask(\''+t.id+'\')"   style="background:#7f8c8d;">'+(t.archived?'♻️':'📦')+'</button>'+
-                '<button onclick="deleteTask(\''+t.id+'\')"    style="background:#e74c3c;">🗑</button>'+
+                '<button onclick="addComment(''+t.id+'')"    style="background:#2ecc71;">💬</button>'+
+                '<button onclick="editTask(''+t.id+'')"      style="background:#f39c12;">✎</button>'+
+                '<button onclick="duplicateTask(''+t.id+'')" style="background:#3498db;">📄</button>'+
+                '<button onclick="archiveTask(''+t.id+'')"   style="background:#7f8c8d;">'+(t.archived?'♻️':'📦')+'</button>'+
+                '<button onclick="deleteTask(''+t.id+'')"    style="background:#e74c3c;">🗑</button>'+
             '</div>';
 
-        if (t.archived) { arch.appendChild(div); counts.arch++; }
-        else if (cols[t.status]) { cols[t.status].appendChild(div); counts[t.status]++; }
+        if(t.archived){ arch.appendChild(div); counts.arch++; }
+        else if(cols[t.status]){ cols[t.status].appendChild(div); counts[t.status]++; }
     });
 
     document.getElementById("cnt-todo").textContent   = counts.todo;
     document.getElementById("cnt-doing").textContent  = counts.doing;
     document.getElementById("cnt-done").textContent   = counts.done;
-    document.getElementById("arch-count").textContent = counts.arch ? "("+counts.arch+") " : "";
+    document.getElementById("arch-count").textContent = counts.arch?"("+counts.arch+") ":"";
 }
-window.render = render;
+window.render=render;
 
 function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-function fmt(d){ return d ? new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}) : '–'; }
+function fmt(d){ return d?new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'}):'–'; }
 
 // ── TRI ──
-function sortTasks() {
+function sortTasks(){
     window._tasks.sort(function(a,b){
-        var la=themeConfig[a.theme]?themeConfig[a.theme].label:a.theme;
-        var lb=themeConfig[b.theme]?themeConfig[b.theme].label:b.theme;
+        var la=getThemeConf(a.theme).label, lb=getThemeConf(b.theme).label;
         if(la<lb) return -1; if(la>lb) return 1;
         var da=a.end?new Date(a.end):new Date("9999-12-31");
         var db=b.end?new Date(b.end):new Date("9999-12-31");
@@ -704,31 +608,97 @@ function sortTasks() {
     saveData(); render(); toast("✅ Tâches triées");
 }
 
+// ── THÈMES ──
+function updateThemeSelect(){
+    var sel=document.getElementById("theme");
+    if(!sel) return;
+    var cur=sel.value;
+    sel.innerHTML=(window._themes||[]).map(function(t){
+        return '<option value="'+esc(t.key)+'">'+esc(t.label)+'</option>';
+    }).join('');
+    if(cur) sel.value=cur;
+}
+
+function openThemesModal(){
+    renderThemesList();
+    document.getElementById("themesOverlay").classList.add("open");
+}
+function closeThemesModal(){
+    document.getElementById("themesOverlay").classList.remove("open");
+}
+function renderThemesList(){
+    var el=document.getElementById("themesList");
+    if(!window._themes||!window._themes.length){
+        el.innerHTML='<p style="color:#aaa;padding:12px;font-size:0.85em;">Aucun thème.</p>';
+        return;
+    }
+    el.innerHTML=window._themes.map(function(t,i){
+        return '<div class="theme-row">'+
+            '<div class="theme-color-swatch" style="background:'+t.color+'"></div>'+
+            '<span class="theme-label-text">'+esc(t.label)+'</span>'+
+            '<input type="color" value="'+t.color+'" onchange="changeThemeColor('+i+',this.value)" '+
+                   'style="width:36px;height:32px;border-radius:6px;border:1.5px solid #ddd;cursor:pointer;padding:2px 3px;">'+
+            '<button class="theme-del-btn" onclick="deleteTheme('+i+')">Supprimer</button>'+
+        '</div>';
+    }).join('');
+}
+function changeThemeColor(i, color){
+    window._themes[i].color=color;
+    renderThemesList();
+    saveData(); render();
+}
+function addTheme(){
+    var label=document.getElementById("newThemeLabel").value.trim();
+    var color=document.getElementById("newThemeColor").value;
+    if(!label){ alert("Saisissez un nom de thème."); return; }
+    var key=label.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g,"").replace(/[^a-z0-9]/g,"_").replace(/_+/g,"_");
+    if(window._themes.find(function(t){ return t.key===key; })){
+        key=key+"_"+Date.now();
+    }
+    window._themes.push({key:key,label:label,color:color});
+    document.getElementById("newThemeLabel").value="";
+    document.getElementById("newThemeColor").value="#3498db";
+    updateThemeSelect();
+    renderThemesList();
+    saveData();
+    toast("🎨 Thème ""+label+"" ajouté");
+}
+function deleteTheme(i){
+    var t=window._themes[i];
+    var used=window._tasks.filter(function(x){ return x.theme===t.key; }).length;
+    if(used>0 && !confirm("Ce thème est utilisé par "+used+" tâche(s). Supprimer quand même ?")) return;
+    window._themes.splice(i,1);
+    updateThemeSelect();
+    renderThemesList();
+    saveData(); render();
+    toast("🗑 Thème supprimé");
+}
+
 // ── FORMULAIRE TÂCHE ──
-function openTaskForm() {
-    document.getElementById("taskId").value        = "";
-    document.getElementById("titleInput").value    = "";
-    document.getElementById("description").value   = "";
-    document.getElementById("urlInput").value      = "";
-    document.getElementById("theme").selectedIndex = 0;
-    document.getElementById("status").value        = "todo";
-    document.getElementById("priority").value      = "Normale";
-    document.getElementById("startDate").value     = "";
-    document.getElementById("endDate").value       = "";
-    document.getElementById("formTitle").textContent = "Nouvelle tâche";
-    currentTaskActors = [];
+function openTaskForm(){
+    document.getElementById("taskId").value="";
+    document.getElementById("titleInput").value="";
+    document.getElementById("description").value="";
+    document.getElementById("urlInput").value="";
+    document.getElementById("status").value="todo";
+    document.getElementById("priority").value="Normale";
+    document.getElementById("startDate").value="";
+    document.getElementById("endDate").value="";
+    document.getElementById("formTitle").textContent="Nouvelle tâche";
+    currentTaskActors=[];
+    updateThemeSelect();
     renderTaskActorChips();
     document.getElementById("taskOverlay").classList.add("open");
-    setTimeout(function(){ document.getElementById("titleInput").focus(); }, 100);
+    setTimeout(function(){ document.getElementById("titleInput").focus(); },100);
 }
-function closeTaskForm() { document.getElementById("taskOverlay").classList.remove("open"); }
+function closeTaskForm(){ document.getElementById("taskOverlay").classList.remove("open"); }
 
-function saveTask() {
-    var title = document.getElementById("titleInput").value.trim();
-    if (!title) { alert("Le titre est obligatoire."); return; }
-    var id = document.getElementById("taskId").value;
-    var now = Date.now();
-    var data = {
+function saveTask(){
+    var title=document.getElementById("titleInput").value.trim();
+    if(!title){ alert("Le titre est obligatoire."); return; }
+    var id=document.getElementById("taskId").value;
+    var now=Date.now();
+    var data={
         title:    title,
         desc:     document.getElementById("description").value,
         url:      document.getElementById("urlInput").value,
@@ -740,95 +710,90 @@ function saveTask() {
         actors:   currentTaskActors.slice(),
         lastMod:  now
     };
-    if (id) {
+    if(id){
         Object.assign(window._tasks.find(function(x){ return x.id===id; }), data);
         toast("✏️ Tâche modifiée");
     } else {
-        data.id = "id_"+now; data.comments = []; data.archived = false;
+        data.id="id_"+now; data.comments=[]; data.archived=false;
         window._tasks.push(data);
         toast("✅ Tâche créée");
     }
     checkAutoArchive(); saveData(); render(); closeTaskForm();
 }
-
-function editTask(id) {
-    var t = window._tasks.find(function(x){ return x.id===id; });
-    document.getElementById("taskId").value        = t.id;
-    document.getElementById("titleInput").value    = t.title;
-    document.getElementById("description").value   = t.desc||"";
-    document.getElementById("urlInput").value      = t.url||"";
-    document.getElementById("theme").value         = t.theme;
-    document.getElementById("status").value        = t.status;
-    document.getElementById("priority").value      = t.priority||"Normale";
-    document.getElementById("startDate").value     = t.start||"";
-    document.getElementById("endDate").value       = t.end||"";
-    document.getElementById("formTitle").textContent = "Modifier la tâche";
-    currentTaskActors = (t.actors||[]).slice();
+function editTask(id){
+    var t=window._tasks.find(function(x){ return x.id===id; });
+    document.getElementById("taskId").value=t.id;
+    document.getElementById("titleInput").value=t.title;
+    document.getElementById("description").value=t.desc||"";
+    document.getElementById("urlInput").value=t.url||"";
+    updateThemeSelect();
+    document.getElementById("theme").value=t.theme;
+    document.getElementById("status").value=t.status;
+    document.getElementById("priority").value=t.priority||"Normale";
+    document.getElementById("startDate").value=t.start||"";
+    document.getElementById("endDate").value=t.end||"";
+    document.getElementById("formTitle").textContent="Modifier la tâche";
+    currentTaskActors=(t.actors||[]).slice();
     renderTaskActorChips();
     document.getElementById("taskOverlay").classList.add("open");
 }
 
 // ── ACTIONS CARTES ──
-function duplicateTask(id) {
-    var idx = window._tasks.findIndex(function(x){ return x.id===id; });
-    var copy = JSON.parse(JSON.stringify(window._tasks[idx]));
-    copy.id = "id_"+Date.now(); copy.title += " (Copie)"; copy.lastMod = Date.now();
-    window._tasks.splice(idx+1, 0, copy);
+function duplicateTask(id){
+    var idx=window._tasks.findIndex(function(x){ return x.id===id; });
+    var copy=JSON.parse(JSON.stringify(window._tasks[idx]));
+    copy.id="id_"+Date.now(); copy.title+=" (Copie)"; copy.lastMod=Date.now();
+    window._tasks.splice(idx+1,0,copy);
     saveData(); render(); toast("📄 Dupliqué");
 }
-function addComment(id) {
-    document.getElementById("commentTaskId").value = id;
-    document.getElementById("commentText").value   = "";
+function addComment(id){
+    document.getElementById("commentTaskId").value=id;
+    document.getElementById("commentText").value="";
     document.getElementById("commentOverlay").classList.add("open");
-    setTimeout(function(){ document.getElementById("commentText").focus(); }, 150);
+    setTimeout(function(){ document.getElementById("commentText").focus(); },150);
 }
-function saveComment() {
-    var id   = document.getElementById("commentTaskId").value;
-    var m    = document.getElementById("commentText").value.trim();
-    if (!m) return;
-    var task = window._tasks.find(function(x){ return x.id === id; });
-    if (!task) return;
-    if (!task.comments) task.comments = [];
+function saveComment(){
+    var id=document.getElementById("commentTaskId").value;
+    var m=document.getElementById("commentText").value.trim();
+    if(!m) return;
+    var task=window._tasks.find(function(x){ return x.id===id; });
+    if(!task) return;
+    if(!task.comments) task.comments=[];
     task.comments.push(m);
     saveData(); render(); closeCommentModal(); toast("💬 Commentaire ajouté");
 }
-function closeCommentModal() {
-    document.getElementById("commentOverlay").classList.remove("open");
-}
-function deleteComment(id, idx) {
-    window._tasks.find(function(x){ return x.id===id; }).comments.splice(idx,1);
-    saveData(); render();
-}
-function deleteTask(id) {
-    if (!confirm("Supprimer définitivement ?")) return;
-    window._tasks = window._tasks.filter(function(x){ return x.id!==id; });
+function closeCommentModal(){ document.getElementById("commentOverlay").classList.remove("open"); }
+function deleteComment(id,idx){ window._tasks.find(function(x){ return x.id===id; }).comments.splice(idx,1); saveData(); render(); }
+function deleteTask(id){
+    if(!confirm("Supprimer définitivement ?")) return;
+    window._tasks=window._tasks.filter(function(x){ return x.id!==id; });
     saveData(); render(); toast("🗑 Supprimé");
 }
-function archiveTask(id) {
-    var t = window._tasks.find(function(x){ return x.id===id; });
-    t.archived = !t.archived; t.lastMod = Date.now();
+function archiveTask(id){
+    var t=window._tasks.find(function(x){ return x.id===id; });
+    t.archived=!t.archived; t.lastMod=Date.now();
     saveData(); render(); toast(t.archived?"📦 Archivé":"♻️ Désarchivé");
 }
 
 // ── DRAG & DROP ──
-function allowDrop(e) { e.preventDefault(); }
-function drop(e) {
+function allowDrop(e){ e.preventDefault(); }
+function drop(e){
     e.preventDefault();
-    var id = e.dataTransfer.getData("text");
-    var dragged = window._tasks.find(function(x){ return x.id===id; });
-    if (!dragged) return;
-    var col = e.target;
-    while (col && !col.classList.contains('column')) col = col.parentElement;
-    if (!col || !col.id) return;
-    var taskList = col.querySelector('.task-list');
-    var after = getDragAfterElement(taskList, e.clientY);
-    window._tasks.splice(window._tasks.indexOf(dragged), 1);
-    dragged.status = col.id; dragged.lastMod = Date.now();
-    if (!after) window._tasks.push(dragged);
-    else window._tasks.splice(window._tasks.findIndex(function(x){ return x.id===after.id; }), 0, dragged);
+    var id=e.dataTransfer.getData("text");
+    var dragged=window._tasks.find(function(x){ return x.id===id; });
+    if(!dragged) return;
+    var col=e.target;
+    while(col && !col.classList.contains('column')) col=col.parentElement;
+    if(!col||!col.id) return;
+    var taskList=col.querySelector('.task-list');
+    var after=getDragAfterElement(taskList,e.clientY);
+    window._tasks.splice(window._tasks.indexOf(dragged),1);
+    dragged.status=col.id; dragged.lastMod=Date.now();
+    if(!after) window._tasks.push(dragged);
+    else window._tasks.splice(window._tasks.findIndex(function(x){ return x.id===after.id; }),0,dragged);
     saveData(); render();
 }
-function getDragAfterElement(container, y) {
+function getDragAfterElement(container,y){
     return Array.prototype.slice.call(container.querySelectorAll('.task:not(.dragging)')).reduce(function(cl,ch){
         var box=ch.getBoundingClientRect(), off=y-box.top-box.height/2;
         if(off<0 && off>cl.offset) return {offset:off,element:ch};
@@ -837,14 +802,14 @@ function getDragAfterElement(container, y) {
 }
 
 // ── ACTEURS ──
-document.getElementById("actorInput").addEventListener("input", function(){
+document.getElementById("actorInput").addEventListener("input",function(){
     var v=this.value.trim();
     if(v && window._actors.indexOf(v)!==-1){
         if(currentTaskActors.indexOf(v)===-1){ currentTaskActors.push(v); renderTaskActorChips(); }
         this.value="";
     }
 });
-document.getElementById("actorInput").addEventListener("keypress", function(e){
+document.getElementById("actorInput").addEventListener("keypress",function(e){
     if(e.key!=="Enter") return;
     e.preventDefault();
     var v=this.value.trim();
@@ -855,11 +820,11 @@ document.getElementById("actorInput").addEventListener("keypress", function(e){
     this.value="";
 });
 function updateActorsDatalist(){
-    document.getElementById("actorsList").innerHTML = window._actors.map(function(a){ return '<option value="'+esc(a)+'">'; }).join("");
+    document.getElementById("actorsList").innerHTML=window._actors.map(function(a){ return '<option value="'+esc(a)+'">'; }).join("");
 }
 function renderTaskActorChips(){
-    document.getElementById("selectedActors").innerHTML = currentTaskActors.map(function(a){
-        return '<span class="actor-label">'+esc(a)+' <span onclick="removeActorChip(\''+a+'\')" style="cursor:pointer">×</span></span>';
+    document.getElementById("selectedActors").innerHTML=currentTaskActors.map(function(a){
+        return '<span class="actor-label">'+esc(a)+' <span onclick="removeActorChip(''+a+'')" style="cursor:pointer">×</span></span>';
     }).join("");
 }
 function removeActorChip(a){ currentTaskActors=currentTaskActors.filter(function(x){ return x!==a; }); renderTaskActorChips(); }
@@ -869,9 +834,9 @@ function addActorToList(){
 }
 function openActorsModal(){
     document.getElementById("actorsOverlay").classList.add("open");
-    document.getElementById("globalActorsList").innerHTML = window._actors.length===0
-        ? '<p style="color:#aaa;padding:12px;font-size:0.85em;">Aucun acteur.</p>'
-        : window._actors.map(function(a,i){
+    document.getElementById("globalActorsList").innerHTML=window._actors.length===0
+        ?'<p style="color:#aaa;padding:12px;font-size:0.85em;">Aucun acteur.</p>'
+        :window._actors.map(function(a,i){
             return '<div style="padding:9px 12px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">'+
                    '<span>'+esc(a)+'</span>'+
                    '<span onclick="removeActor('+i+')" style="color:#e74c3c;cursor:pointer;font-size:0.85em;font-weight:600;">Supprimer</span></div>';
@@ -880,18 +845,20 @@ function openActorsModal(){
 function removeActor(i){ window._actors.splice(i,1); saveData(); openActorsModal(); updateActorsDatalist(); }
 function closeActorsModal(){ document.getElementById("actorsOverlay").classList.remove("open"); }
 
-// ── EXPORT ──
+// ── EXPORT / IMPORT ──
 function exportCSV(){
     if(!window._tasks.length) return alert("Aucune tâche.");
     var h=["ID","Thematique","Titre","Description","Statut","Priorite","Debut","Fin","Acteurs","URL","Archive","Commentaires","Derniere_Modif"];
     var rows=window._tasks.map(function(t){
-        return [t.id,(themeConfig[t.theme]||{label:t.theme}).label,t.title,t.desc||"",t.status,
+        return [t.id,getThemeConf(t.theme).label,t.title,t.desc||"",t.status,
                 t.priority,t.start||"",t.end||"",(t.actors||[]).join(", "),t.url||"",
                 t.archived?"Oui":"Non",(t.comments||[]).join(" | "),
                 t.lastMod?new Date(t.lastMod).toLocaleString('fr-FR'):""
         ].map(function(v){ return '"'+v.toString().replace(/"/g,'""')+'"'; }).join(";");
     });
-    dl("\uFEFF"+h.join(";")+"\n"+rows.join("\n"),"Export_Kanban_"+td()+".csv","text/csv;charset=utf-8;");
+    dl("﻿"+h.join(";")+"
+"+rows.join("
+"),"Export_Kanban_"+td()+".csv","text/csv;charset=utf-8;");
 }
 function exportJSON(){ dl(JSON.stringify(buildPayload(),null,2),"Backup_Kanban_"+td()+".json","application/json"); }
 function importJSON(event){
@@ -904,12 +871,14 @@ function importJSON(event){
             if(!confirm("Remplacer toutes les données actuelles ?")) return;
             window._tasks        = data.tasks  || [];
             window._actors       = data.actors || [];
+            window._themes       = data.themes && data.themes.length ? data.themes : window._DEFAULT_THEMES.slice();
             window._miscText     = data.misc   || "";
             window._miscLastDate = data.miscLastDate || "";
             window._codirDate    = data.codirDate    || "";
-            var cd = document.getElementById("codirDate");
-            if (cd) cd.value = window._codirDate;
+            var cd=document.getElementById("codirDate");
+            if(cd) cd.value=window._codirDate;
             updateMiscDateLabel();
+            updateThemeSelect();
             checkAutoArchive(); saveData(); render();
             toast("✅ Import réussi — "+window._tasks.length+" tâches");
         }catch(err){ alert("❌ "+err.message); }
@@ -924,56 +893,25 @@ function dl(content,name,type){
 function td(){ return new Date().toISOString().split('T')[0]; }
 
 // ── UTILITAIRES ──
-function saveCodirDate() { saveData(); }
-
-function updateMiscDateLabel() {
-    var label = document.getElementById("miscDateLabel");
-    if (!label) return;
-    if (window._miscLastDate) {
-        var d = new Date(window._miscLastDate);
-        label.textContent = " — " + d.toLocaleDateString('fr-FR', {day:'2-digit', month:'2-digit', year:'numeric'});
-    } else {
-        label.textContent = "";
-    }
+function saveCodirDate(){ saveData(); }
+function updateMiscDateLabel(){
+    var label=document.getElementById("miscDateLabel"); if(!label) return;
+    label.textContent=window._miscLastDate?" — "+new Date(window._miscLastDate).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}):"";
 }
-window.updateMiscDateLabel = updateMiscDateLabel;
-
-function openMiscModal() {
-    document.getElementById("miscTextarea").value = window._miscText || "";
-    document.getElementById("miscOverlay").classList.add("open");
-    setTimeout(function(){ document.getElementById("miscTextarea").focus(); }, 100);
-}
-function closeMiscModal() {
-    document.getElementById("miscOverlay").classList.remove("open");
-}
-function saveMiscInfo() {
-    window._miscText     = document.getElementById("miscTextarea").value;
-    window._miscLastDate = new Date().toISOString();
-    updateMiscDateLabel();
-    saveData();
-    closeMiscModal();
-    toast("✅ Infos sauvegardées");
-}
-function toggleArchives(){
-    archivesOpen=!archivesOpen;
-    document.getElementById("archives-content").style.display=archivesOpen?"flex":"none";
-}
+window.updateMiscDateLabel=updateMiscDateLabel;
+function openMiscModal(){ document.getElementById("miscTextarea").value=window._miscText||""; document.getElementById("miscOverlay").classList.add("open"); setTimeout(function(){ document.getElementById("miscTextarea").focus(); },100); }
+function closeMiscModal(){ document.getElementById("miscOverlay").classList.remove("open"); }
+function saveMiscInfo(){ window._miscText=document.getElementById("miscTextarea").value; window._miscLastDate=new Date().toISOString(); updateMiscDateLabel(); saveData(); closeMiscModal(); toast("✅ Infos sauvegardées"); }
+function toggleArchives(){ archivesOpen=!archivesOpen; document.getElementById("archives-content").style.display=archivesOpen?"flex":"none"; }
 var _tt;
-function toast(msg){
-    var el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show");
-    clearTimeout(_tt); _tt=setTimeout(function(){ el.classList.remove("show"); },2500);
-}
-document.querySelectorAll('.overlay').forEach(function(o){
-    o.addEventListener('click',function(e){ if(e.target===o) o.classList.remove('open'); });
-});
+function toast(msg){ var el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(_tt); _tt=setTimeout(function(){ el.classList.remove("show"); },2500); }
 
-document.getElementById('commentSaveBtn').addEventListener('click', function(){ saveComment(); });
-document.getElementById('commentCancelBtn').addEventListener('click', function(){ closeCommentModal(); });
-document.getElementById('commentText').addEventListener('keydown', function(e){
-    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); saveComment(); }
-});
-document.getElementById('miscSaveBtn').addEventListener('click', function(){ saveMiscInfo(); });
-document.getElementById('miscCancelBtn').addEventListener('click', function(){ closeMiscModal(); });
+document.querySelectorAll('.overlay').forEach(function(o){ o.addEventListener('click',function(e){ if(e.target===o) o.classList.remove('open'); }); });
+document.getElementById('commentSaveBtn').addEventListener('click',function(){ saveComment(); });
+document.getElementById('commentCancelBtn').addEventListener('click',function(){ closeCommentModal(); });
+document.getElementById('commentText').addEventListener('keydown',function(e){ if(e.key==='Enter'&&(e.ctrlKey||e.metaKey)){ e.preventDefault(); saveComment(); } });
+document.getElementById('miscSaveBtn').addEventListener('click',function(){ saveMiscInfo(); });
+document.getElementById('miscCancelBtn').addEventListener('click',function(){ closeMiscModal(); });
 </script>
 </body>
 </html>
