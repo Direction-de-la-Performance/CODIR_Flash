@@ -197,7 +197,7 @@
 
     <div id="kanban">
         <div class="column" id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
-            <h2>⚡ Cette semaine<br><span class="col-sub">évènements, échéances, rendez-vous… <span class="col-count" id="cnt-todo">0</span></span></h2>
+            <h2>⚡ Semaine du 20 au 24 avril 2026<br><span class="col-sub">évènements, échéances, rendez-vous… <span class="col-count" id="cnt-todo">0</span></span></h2>
             <div class="task-list"></div>
         </div>
         <div class="column" id="doing" ondrop="drop(event)" ondragover="allowDrop(event)">
@@ -257,7 +257,7 @@
             <div class="form-group">
                 <label>Colonne</label>
                 <select id="status">
-                    <option value="todo">⚡ Cette semaine</option>
+                    <option value="todo">⚡ Semaine du 20 au 24 avril 2026</option>
                     <option value="doing">📋 Prochaines semaines</option>
                     <option value="done">🏆 Sujets importants</option>
                 </select>
@@ -335,7 +335,7 @@
 
 <!-- ═══ VARIABLES GLOBALES ═══ -->
 <script>
-    window.APP_PASSWORD_HASH = "342edb77c95f94da5f1c2e5a397d5467ba9e09b141e69dfa182cb243cb5b3b32";
+    window.APP_PASSWORD_HASH = "342edb77c95f94da5f1c2e5a397d5467ba9e09b141e69dfa182cb243cb5b3b32"; /* perf */
     window._tasks         = [];
     window._actors        = [];
     window._themes        = [];   // [{key,label,color}]
@@ -358,8 +358,8 @@
 
 <!-- ═══ FIREBASE SDK ═══ -->
 <script type="module">
-    import { initializeApp }                  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+    import { initializeApp }                        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
     const firebaseConfig = {
         apiKey:            "AIzaSyDO0NbmRH-PDSZhkxGqRgK14IjCmzwrEz8",
@@ -371,9 +371,9 @@
         appId:             "1:948226599876:web:6bed66c5248172ebc95291"
     };
 
-    const app   = initializeApp(firebaseConfig);
-    const db    = getDatabase(app);
-    const dbRef = ref(db, "kanban");
+    const app     = initializeApp(firebaseConfig);
+    const db      = getDatabase(app);
+    const rootRef = ref(db, "kanban");
 
     var loadingTimeout = setTimeout(function() {
         if (!window._firstSyncDone) {
@@ -383,40 +383,94 @@
         }
     }, 8000);
 
-    onValue(dbRef, function(snapshot) {
+    // ── Convertit l'objet Firebase {id: task} en tableau trié par order ──
+    function objToTaskArray(raw) {
+        if (!raw) return [];
+        if (Array.isArray(raw)) {
+            // Ancien format : on assigne les order manquants
+            return raw.map(function(t, i) {
+                if (t.order == null) t.order = i * 1000;
+                return t;
+            });
+        }
+        var arr = Object.values(raw);
+        arr.sort(function(a, b) { return (a.order || 0) - (b.order || 0); });
+        return arr;
+    }
+
+    onValue(rootRef, function(snapshot) {
         var data = snapshot.val() || {};
+
+        // Détecte l'ancien format à plat vs le nouveau format {tasks:{}, meta:{}}
+        var isLegacy = data.tasks == null || Array.isArray(data.tasks);
+        var rawTasks = data.tasks || {};
+        var meta = isLegacy ? {
+            actors:       data.actors       || [],
+            themes:       data.themes        || [],
+            misc:         data.misc          || "",
+            miscLastDate: data.miscLastDate  || "",
+            codirDate:    data.codirDate     || ""
+        } : (data.meta || {});
+
+        var tasksArray = objToTaskArray(rawTasks);
 
         if (!window._firstSyncDone) {
             clearTimeout(loadingTimeout);
             window._firstSyncDone = true;
 
-            if (!data.tasks || data.tasks.length === 0) {
-                // Premier démarrage : seed depuis CSV
-                window._tasks  = window._DEFAULT_TASKS.slice();
+            if (tasksArray.length === 0) {
+                // Premier démarrage : seed
+                window._tasks  = window._DEFAULT_TASKS.slice().map(function(t, i) {
+                    t.order = i * 1000; return t;
+                });
                 window._actors = window._DEFAULT_ACTORS.slice();
                 window._themes = window._DEFAULT_THEMES.slice();
                 window._miscText = ""; window._miscLastDate = ""; window._codirDate = "";
-                setTimeout(function(){ if(window._fbSet) window._fbSet(buildPayload()); }, 600);
+                setTimeout(function() { if (window._fbSaveAll) window._fbSaveAll(); }, 600);
             } else {
-                window._tasks        = data.tasks  || [];
-                window._actors       = data.actors || [];
-                window._themes       = data.themes && data.themes.length ? data.themes : window._DEFAULT_THEMES.slice();
-                window._miscText     = data.misc   || "";
-                window._miscLastDate = data.miscLastDate || "";
-                window._codirDate    = data.codirDate    || "";
+                window._tasks        = tasksArray;
+                window._actors       = meta.actors || [];
+                window._themes       = meta.themes && meta.themes.length ? meta.themes : window._DEFAULT_THEMES.slice();
+                window._miscText     = meta.misc         || "";
+                window._miscLastDate = meta.miscLastDate || "";
+                window._codirDate    = meta.codirDate    || "";
+                // Migration de l'ancien format à plat → nouveau format par tâche
+                if (isLegacy) {
+                    setTimeout(function() {
+                        console.log("Migration Firebase : passage au format par tâche…");
+                        if (window._fbSaveAll) window._fbSaveAll();
+                    }, 800);
+                }
             }
 
             document.getElementById("loading-screen").style.display = "none";
             document.getElementById("app").style.display = "block";
             if (typeof window.initApp === "function") window.initApp();
+
         } else {
-            if (document.getElementById("taskOverlay").classList.contains("open")) return;
-            window._tasks        = data.tasks  || [];
-            window._actors       = data.actors || [];
-            window._themes       = data.themes && data.themes.length ? data.themes : window._DEFAULT_THEMES.slice();
-            window._miscText     = data.misc   || "";
-            window._miscLastDate = data.miscLastDate || "";
-            window._codirDate    = data.codirDate    || "";
+            // ── Smart merge : applique les mises à jour distantes sans écraser une édition locale ──
+            var editingId = document.getElementById("taskOverlay").classList.contains("open")
+                ? document.getElementById("taskId").value
+                : null;
+            var localEditing = editingId
+                ? window._tasks.find(function(t) { return t.id === editingId; })
+                : null;
+
+            // Mise à jour tâche par tâche : on préserve la version locale si en cours d'édition
+            window._tasks = tasksArray.map(function(remote) {
+                if (editingId && remote.id === editingId && localEditing) return localEditing;
+                return remote;
+            });
+            // Si la tâche éditée est nouvelle (pas encore dans Firebase), on la conserve
+            if (editingId && localEditing && !window._tasks.find(function(t) { return t.id === editingId; })) {
+                window._tasks.push(localEditing);
+            }
+
+            window._actors       = meta.actors || window._actors;
+            window._themes       = (meta.themes && meta.themes.length) ? meta.themes : window._DEFAULT_THEMES.slice();
+            window._miscText     = meta.misc         || "";
+            window._miscLastDate = meta.miscLastDate || "";
+            window._codirDate    = meta.codirDate    || "";
             var cd = document.getElementById("codirDate");
             if (cd && document.activeElement !== cd) cd.value = window._codirDate;
             if (typeof window.updateMiscDateLabel === "function") window.updateMiscDateLabel();
@@ -425,12 +479,49 @@
         setSyncDot("synced", "Synchronisé ✓");
     });
 
-    window._fbSet = function(payload) {
+    // ── Écriture d'une seule tâche (chemin kanban/tasks/<id>) ──
+    window._fbSetTask = function(taskId, taskData) {
         setSyncDot("syncing", "Sync…");
-        set(dbRef, payload)
+        set(ref(db, "kanban/tasks/" + taskId), taskData)
             .then(function()  { setSyncDot("synced",  "Synchronisé ✓"); })
             .catch(function(e){ setSyncDot("error",   "Erreur sync ✗"); console.error(e); });
     };
+
+    // ── Suppression d'une seule tâche ──
+    window._fbDeleteTask = function(taskId) {
+        setSyncDot("syncing", "Sync…");
+        remove(ref(db, "kanban/tasks/" + taskId))
+            .then(function()  { setSyncDot("synced",  "Synchronisé ✓"); })
+            .catch(function(e){ setSyncDot("error",   "Erreur sync ✗"); console.error(e); });
+    };
+
+    // ── Écriture des métadonnées (acteurs, thèmes, misc, date CODIR) ──
+    window._fbSetMeta = function(meta) {
+        setSyncDot("syncing", "Sync…");
+        set(ref(db, "kanban/meta"), meta)
+            .then(function()  { setSyncDot("synced",  "Synchronisé ✓"); })
+            .catch(function(e){ setSyncDot("error",   "Erreur sync ✗"); console.error(e); });
+    };
+
+    // ── Sauvegarde complète (seed initial, import JSON, tri global) ──
+    window._fbSaveAll = function() {
+        if (!window._tasks) return;
+        setSyncDot("syncing", "Sync…");
+        var tasksObj = {};
+        window._tasks.forEach(function(t) { tasksObj[t.id] = t; });
+        set(rootRef, {
+            tasks: tasksObj,
+            meta: {
+                actors:       window._actors       || [],
+                themes:       window._themes        || [],
+                misc:         window._miscText      || "",
+                miscLastDate: window._miscLastDate  || "",
+                codirDate:    window._codirDate     || ""
+            }
+        }).then(function()  { setSyncDot("synced",  "Synchronisé ✓"); })
+          .catch(function(e){ setSyncDot("error",   "Erreur sync ✗"); console.error(e); });
+    };
+
     function setSyncDot(cls, label) {
         var d=document.getElementById("sync-dot"), l=document.getElementById("sync-label");
         if(d) d.className=cls; if(l) l.textContent=label;
@@ -510,7 +601,17 @@ window.onload = function() {
 };
 
 // ── PERSISTANCE ──
+function buildMeta() {
+    return {
+        actors:       window._actors       || [],
+        themes:       window._themes        || [],
+        misc:         window._miscText      || "",
+        miscLastDate: window._miscLastDate  || "",
+        codirDate:    (document.getElementById("codirDate") ? document.getElementById("codirDate").value : "") || window._codirDate || ""
+    };
+}
 function buildPayload() {
+    // Conservé pour l'export JSON et localStorage
     return {
         tasks:        window._tasks,
         actors:       window._actors,
@@ -520,21 +621,47 @@ function buildPayload() {
         codirDate:    (document.getElementById("codirDate")?document.getElementById("codirDate").value:"")||window._codirDate||""
     };
 }
-function saveData() {
-    var p=buildPayload();
-    try{ localStorage.setItem("kanban_data",JSON.stringify(p)); }catch(e){}
-    if(window._fbSet) window._fbSet(p);
+function _lsSnap() { try{ localStorage.setItem("kanban_data",JSON.stringify(buildPayload())); }catch(e){} }
+
+// Sauvegarde ciblée d'une seule tâche (opération principale)
+function saveOneTask(taskId) {
+    var t = window._tasks.find(function(x){ return x.id===taskId; });
+    if (!t) return;
+    _lsSnap();
+    if (window._fbSetTask) window._fbSetTask(taskId, t);
 }
-function scheduleSync(){ clearTimeout(_syncTimer); _syncTimer=setTimeout(saveData,800); }
+
+// Sauvegarde des métadonnées (acteurs, thèmes, misc, date CODIR)
+function saveMeta() {
+    _lsSnap();
+    if (window._fbSetMeta) window._fbSetMeta(buildMeta());
+}
+
+// Sauvegarde complète — uniquement pour tri global, import JSON, archivage en masse
+function saveData() {
+    _lsSnap();
+    if (window._fbSaveAll) window._fbSaveAll();
+}
+
+var _taskSyncTimers = {};
+function scheduleSync(taskId) {
+    if (taskId) {
+        clearTimeout(_taskSyncTimers[taskId]);
+        _taskSyncTimers[taskId] = setTimeout(function(){ saveOneTask(taskId); }, 800);
+    } else {
+        clearTimeout(_syncTimer); _syncTimer = setTimeout(saveData, 800);
+    }
+}
 
 // ── ARCHIVAGE AUTO (actif dès dépassement de la date de fin) ──
 function checkAutoArchive() {
     var d=new Date(); d.setHours(0,0,0,0);
-    var changed=false;
     window._tasks.forEach(function(t){
-        if(t.end && !t.archived && new Date(t.end)<d){ t.archived=true; t.lastMod=Date.now(); changed=true; }
+        if(t.end && !t.archived && new Date(t.end)<d){
+            t.archived=true; t.lastMod=Date.now();
+            saveOneTask(t.id);
+        }
     });
-    if(changed) saveData();
 }
 
 // ── RENDU ──
@@ -547,7 +674,10 @@ function render() {
     arch.innerHTML="";
     var counts={todo:0,doing:0,done:0,arch:0};
 
-    window._tasks.forEach(function(t){
+    // Tri par champ order avant rendu (garantit l'ordre après drag & drop)
+    var sorted=window._tasks.slice().sort(function(a,b){ return (a.order||0)-(b.order||0); });
+
+    sorted.forEach(function(t){
         var conf=getThemeConf(t.theme);
         var div=document.createElement("div");
         div.className="task"+(t.archived?" archived":"");
@@ -605,6 +735,8 @@ function sortTasks(){
         var db=b.end?new Date(b.end):new Date("9999-12-31");
         return da-db;
     });
+    // Réaffecte les ordres après le tri
+    window._tasks.forEach(function(t,i){ t.order=i*1000; });
     saveData(); render(); toast("✅ Tâches triées");
 }
 
@@ -645,7 +777,7 @@ function renderThemesList(){
 function changeThemeColor(i, color){
     window._themes[i].color=color;
     renderThemesList();
-    saveData(); render();
+    saveMeta(); render();
 }
 function addTheme(){
     var label=document.getElementById("newThemeLabel").value.trim();
@@ -660,7 +792,7 @@ function addTheme(){
     document.getElementById("newThemeColor").value="#3498db";
     updateThemeSelect();
     renderThemesList();
-    saveData();
+    saveMeta();
     toast("🎨 Thème ""+label+"" ajouté");
 }
 function deleteTheme(i){
@@ -670,7 +802,7 @@ function deleteTheme(i){
     window._themes.splice(i,1);
     updateThemeSelect();
     renderThemesList();
-    saveData(); render();
+    saveMeta(); render();
     toast("🗑 Thème supprimé");
 }
 
@@ -712,13 +844,17 @@ function saveTask(){
     };
     if(id){
         Object.assign(window._tasks.find(function(x){ return x.id===id; }), data);
+        saveOneTask(id);
         toast("✏️ Tâche modifiée");
     } else {
         data.id="id_"+now; data.comments=[]; data.archived=false;
+        // order = timestamp garantit un placement en fin de colonne
+        data.order=now;
         window._tasks.push(data);
+        saveOneTask(data.id);
         toast("✅ Tâche créée");
     }
-    checkAutoArchive(); saveData(); render(); closeTaskForm();
+    checkAutoArchive(); render(); closeTaskForm();
 }
 function editTask(id){
     var t=window._tasks.find(function(x){ return x.id===id; });
@@ -743,8 +879,9 @@ function duplicateTask(id){
     var idx=window._tasks.findIndex(function(x){ return x.id===id; });
     var copy=JSON.parse(JSON.stringify(window._tasks[idx]));
     copy.id="id_"+Date.now(); copy.title+=" (Copie)"; copy.lastMod=Date.now();
+    copy.order=Date.now()+1;
     window._tasks.splice(idx+1,0,copy);
-    saveData(); render(); toast("📄 Dupliqué");
+    saveOneTask(copy.id); render(); toast("📄 Dupliqué");
 }
 function addComment(id){
     document.getElementById("commentTaskId").value=id;
@@ -760,19 +897,25 @@ function saveComment(){
     if(!task) return;
     if(!task.comments) task.comments=[];
     task.comments.push(m);
-    saveData(); render(); closeCommentModal(); toast("💬 Commentaire ajouté");
+    task.lastMod=Date.now();
+    saveOneTask(id); render(); closeCommentModal(); toast("💬 Commentaire ajouté");
 }
 function closeCommentModal(){ document.getElementById("commentOverlay").classList.remove("open"); }
-function deleteComment(id,idx){ window._tasks.find(function(x){ return x.id===id; }).comments.splice(idx,1); saveData(); render(); }
+function deleteComment(id,idx){
+    var t=window._tasks.find(function(x){ return x.id===id; });
+    t.comments.splice(idx,1); t.lastMod=Date.now();
+    saveOneTask(id); render();
+}
 function deleteTask(id){
     if(!confirm("Supprimer définitivement ?")) return;
     window._tasks=window._tasks.filter(function(x){ return x.id!==id; });
-    saveData(); render(); toast("🗑 Supprimé");
+    if(window._fbDeleteTask) window._fbDeleteTask(id);
+    _lsSnap(); render(); toast("🗑 Supprimé");
 }
 function archiveTask(id){
     var t=window._tasks.find(function(x){ return x.id===id; });
     t.archived=!t.archived; t.lastMod=Date.now();
-    saveData(); render(); toast(t.archived?"📦 Archivé":"♻️ Désarchivé");
+    saveOneTask(id); render(); toast(t.archived?"📦 Archivé":"♻️ Désarchivé");
 }
 
 // ── DRAG & DROP ──
@@ -786,12 +929,29 @@ function drop(e){
     while(col && !col.classList.contains('column')) col=col.parentElement;
     if(!col||!col.id) return;
     var taskList=col.querySelector('.task-list');
-    var after=getDragAfterElement(taskList,e.clientY);
-    window._tasks.splice(window._tasks.indexOf(dragged),1);
-    dragged.status=col.id; dragged.lastMod=Date.now();
-    if(!after) window._tasks.push(dragged);
-    else window._tasks.splice(window._tasks.findIndex(function(x){ return x.id===after.id; }),0,dragged);
-    saveData(); render();
+    var afterEl=getDragAfterElement(taskList,e.clientY);
+    var afterTask=afterEl?window._tasks.find(function(x){ return x.id===afterEl.id; }):null;
+
+    // Calcul du nouvel order par interpolation entre les voisins (évite de réécrire toutes les tâches)
+    var colTasks=window._tasks
+        .filter(function(t){ return t.status===col.id && !t.archived && t.id!==id; })
+        .sort(function(a,b){ return (a.order||0)-(b.order||0); });
+    var newOrder;
+    if(!afterTask){
+        var maxO=colTasks.length ? colTasks[colTasks.length-1].order||0 : 0;
+        newOrder=maxO+1000;
+    } else {
+        var ai=colTasks.indexOf(afterTask);
+        newOrder=ai<=0
+            ? (afterTask.order||0)-500
+            : ((colTasks[ai-1].order||0)+(afterTask.order||0))/2;
+    }
+
+    dragged.status=col.id;
+    dragged.order=newOrder;
+    dragged.lastMod=Date.now();
+    saveOneTask(dragged.id);
+    render();
 }
 function getDragAfterElement(container,y){
     return Array.prototype.slice.call(container.querySelectorAll('.task:not(.dragging)')).reduce(function(cl,ch){
@@ -815,7 +975,7 @@ document.getElementById("actorInput").addEventListener("keypress",function(e){
     var v=this.value.trim();
     if(v){
         if(currentTaskActors.indexOf(v)===-1){ currentTaskActors.push(v); renderTaskActorChips(); }
-        if(window._actors.indexOf(v)===-1){ window._actors.push(v); updateActorsDatalist(); saveData(); }
+        if(window._actors.indexOf(v)===-1){ window._actors.push(v); updateActorsDatalist(); saveMeta(); }
     }
     this.value="";
 });
@@ -830,7 +990,7 @@ function renderTaskActorChips(){
 function removeActorChip(a){ currentTaskActors=currentTaskActors.filter(function(x){ return x!==a; }); renderTaskActorChips(); }
 function addActorToList(){
     var n=document.getElementById("newActorName").value.trim();
-    if(n && window._actors.indexOf(n)===-1){ window._actors.push(n); updateActorsDatalist(); saveData(); openActorsModal(); document.getElementById("newActorName").value=""; }
+    if(n && window._actors.indexOf(n)===-1){ window._actors.push(n); updateActorsDatalist(); saveMeta(); openActorsModal(); document.getElementById("newActorName").value=""; }
 }
 function openActorsModal(){
     document.getElementById("actorsOverlay").classList.add("open");
@@ -842,7 +1002,7 @@ function openActorsModal(){
                    '<span onclick="removeActor('+i+')" style="color:#e74c3c;cursor:pointer;font-size:0.85em;font-weight:600;">Supprimer</span></div>';
           }).join("");
 }
-function removeActor(i){ window._actors.splice(i,1); saveData(); openActorsModal(); updateActorsDatalist(); }
+function removeActor(i){ window._actors.splice(i,1); saveMeta(); openActorsModal(); updateActorsDatalist(); }
 function closeActorsModal(){ document.getElementById("actorsOverlay").classList.remove("open"); }
 
 // ── EXPORT / IMPORT ──
@@ -875,6 +1035,8 @@ function importJSON(event){
             window._miscText     = data.misc   || "";
             window._miscLastDate = data.miscLastDate || "";
             window._codirDate    = data.codirDate    || "";
+            // Assigner les ordres manquants (fichiers exportés avant la migration)
+            window._tasks.forEach(function(t,i){ if(t.order==null) t.order=i*1000; });
             var cd=document.getElementById("codirDate");
             if(cd) cd.value=window._codirDate;
             updateMiscDateLabel();
@@ -893,7 +1055,7 @@ function dl(content,name,type){
 function td(){ return new Date().toISOString().split('T')[0]; }
 
 // ── UTILITAIRES ──
-function saveCodirDate(){ saveData(); }
+function saveCodirDate(){ window._codirDate=document.getElementById("codirDate").value; saveMeta(); }
 function updateMiscDateLabel(){
     var label=document.getElementById("miscDateLabel"); if(!label) return;
     label.textContent=window._miscLastDate?" — "+new Date(window._miscLastDate).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}):"";
@@ -901,7 +1063,7 @@ function updateMiscDateLabel(){
 window.updateMiscDateLabel=updateMiscDateLabel;
 function openMiscModal(){ document.getElementById("miscTextarea").value=window._miscText||""; document.getElementById("miscOverlay").classList.add("open"); setTimeout(function(){ document.getElementById("miscTextarea").focus(); },100); }
 function closeMiscModal(){ document.getElementById("miscOverlay").classList.remove("open"); }
-function saveMiscInfo(){ window._miscText=document.getElementById("miscTextarea").value; window._miscLastDate=new Date().toISOString(); updateMiscDateLabel(); saveData(); closeMiscModal(); toast("✅ Infos sauvegardées"); }
+function saveMiscInfo(){ window._miscText=document.getElementById("miscTextarea").value; window._miscLastDate=new Date().toISOString(); updateMiscDateLabel(); saveMeta(); closeMiscModal(); toast("✅ Infos sauvegardées"); }
 function toggleArchives(){ archivesOpen=!archivesOpen; document.getElementById("archives-content").style.display=archivesOpen?"flex":"none"; }
 var _tt;
 function toast(msg){ var el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(_tt); _tt=setTimeout(function(){ el.classList.remove("show"); },2500); }
