@@ -702,14 +702,14 @@ function render() {
             '<div style="margin:4px 0;">'+(t.actors||[]).map(function(a){ return '<span class="actor-label">'+esc(a)+'</span>'; }).join('')+'</div>'+
             urlStr+
             '<div>'+(t.comments||[]).map(function(c,i){
-                return '<div class="comment-box"><span>'+esc(c)+'</span><span class="del-com" onclick="deleteComment(''+t.id+'','+i+')">×</span></div>';
+                return '<div class="comment-box"><span>'+esc(c)+'</span><span class="del-com" onclick="deleteComment(\''+t.id+'\','+i+')">×</span></div>';
             }).join('')+'</div>'+
             '<div class="task-actions">'+
-                '<button onclick="addComment(''+t.id+'')"    style="background:#2ecc71;">💬</button>'+
-                '<button onclick="editTask(''+t.id+'')"      style="background:#f39c12;">✎</button>'+
-                '<button onclick="duplicateTask(''+t.id+'')" style="background:#3498db;">📄</button>'+
-                '<button onclick="archiveTask(''+t.id+'')"   style="background:#7f8c8d;">'+(t.archived?'♻️':'📦')+'</button>'+
-                '<button onclick="deleteTask(''+t.id+'')"    style="background:#e74c3c;">🗑</button>'+
+                '<button onclick="addComment(\''+t.id+'\')"    style="background:#2ecc71;">💬</button>'+
+                '<button onclick="editTask(\''+t.id+'\')"      style="background:#f39c12;">✎</button>'+
+                '<button onclick="duplicateTask(\''+t.id+'\')" style="background:#3498db;">📄</button>'+
+                '<button onclick="archiveTask(\''+t.id+'\')"   style="background:#7f8c8d;">'+(t.archived?'♻️':'📦')+'</button>'+
+                '<button onclick="deleteTask(\''+t.id+'\')"    style="background:#e74c3c;">🗑</button>'+
             '</div>';
 
         if(t.archived){ arch.appendChild(div); counts.arch++; }
@@ -984,7 +984,7 @@ function updateActorsDatalist(){
 }
 function renderTaskActorChips(){
     document.getElementById("selectedActors").innerHTML=currentTaskActors.map(function(a){
-        return '<span class="actor-label">'+esc(a)+' <span onclick="removeActorChip(''+a+'')" style="cursor:pointer">×</span></span>';
+        return '<span class="actor-label">'+esc(a)+' <span onclick="removeActorChip(\''+a+'\')" style="cursor:pointer">×</span></span>';
     }).join("");
 }
 function removeActorChip(a){ currentTaskActors=currentTaskActors.filter(function(x){ return x!==a; }); renderTaskActorChips(); }
