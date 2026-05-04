@@ -197,7 +197,7 @@
 
     <div id="kanban">
         <div class="column" id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
-            <h2>⚡ Semaine du 20 au 24 avril 2026<br><span class="col-sub">évènements, échéances, rendez-vous… <span class="col-count" id="cnt-todo">0</span></span></h2>
+            <h2>⚡ <span id="todo-week-label"></span><br><span class="col-sub">évènements, échéances, rendez-vous… <span class="col-count" id="cnt-todo">0</span></span></h2>
             <div class="task-list"></div>
         </div>
         <div class="column" id="doing" ondrop="drop(event)" ondragover="allowDrop(event)">
@@ -257,7 +257,7 @@
             <div class="form-group">
                 <label>Colonne</label>
                 <select id="status">
-                    <option value="todo">⚡ Semaine du 20 au 24 avril 2026</option>
+                    <option value="todo" id="todo-select-label">⚡ </option>
                     <option value="doing">📋 Prochaines semaines</option>
                     <option value="done">🏆 Sujets importants</option>
                 </select>
@@ -1065,6 +1065,39 @@ function saveMiscInfo(){ window._miscText=document.getElementById("miscTextarea"
 function toggleArchives(){ archivesOpen=!archivesOpen; document.getElementById("archives-content").style.display=archivesOpen?"flex":"none"; }
 var _tt;
 function toast(msg){ var el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(_tt); _tt=setTimeout(function(){ el.classList.remove("show"); },2500); }
+
+// ── SEMAINE COURANTE (mise à jour automatique chaque lundi) ──
+function getCurrentWeekLabel() {
+    var now = new Date();
+    var day = now.getDay(); // 0=dim, 1=lun … 6=sam
+    var diffToMonday = (day === 0) ? -6 : 1 - day;
+    var monday = new Date(now);
+    monday.setDate(now.getDate() + diffToMonday);
+    var friday = new Date(monday);
+    friday.setDate(monday.getDate() + 4);
+
+    var months = ["janvier","février","mars","avril","mai","juin",
+                  "juillet","août","septembre","octobre","novembre","décembre"];
+
+    var d1 = monday.getDate();
+    var d2 = friday.getDate();
+    var m1 = months[monday.getMonth()];
+    var m2 = months[friday.getMonth()];
+    var y  = friday.getFullYear();
+
+    if (monday.getMonth() === friday.getMonth()) {
+        return "Semaine du " + d1 + " au " + d2 + " " + m2 + " " + y;
+    } else {
+        return "Semaine du " + d1 + " " + m1 + " au " + d2 + " " + m2 + " " + y;
+    }
+}
+(function applyWeekLabel() {
+    var label = getCurrentWeekLabel();
+    var h2span = document.getElementById("todo-week-label");
+    if (h2span) h2span.textContent = label;
+    var opt = document.getElementById("todo-select-label");
+    if (opt) opt.textContent = "⚡ " + label;
+})();
 
 document.querySelectorAll('.overlay').forEach(function(o){ o.addEventListener('click',function(e){ if(e.target===o) o.classList.remove('open'); }); });
 document.getElementById('commentSaveBtn').addEventListener('click',function(){ saveComment(); });
