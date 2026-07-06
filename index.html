@@ -147,6 +147,13 @@
         #toast.show { transform:translateY(0); opacity:1; }
         ::-webkit-scrollbar { width:6px; height:6px; }
         ::-webkit-scrollbar-thumb { background:#ccc; border-radius:3px; }
+
+        /* ── MODE INVITÉ (lecture seule) ── */
+        .guest-mode .admin-only { display:none !important; }
+        #guest-badge { display:none; background:#7f8c8d; color:white; font-size:0.72em; font-weight:700; padding:5px 10px; border-radius:20px; }
+        .guest-mode #guest-badge { display:inline-flex; align-items:center; gap:4px; }
+        #login-guest-btn { width:100%; padding:12px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.2); border-radius:10px; color:rgba(255,255,255,0.85); font-size:0.88em; font-weight:600; cursor:pointer; margin-top:10px; font-family:inherit; transition:background 0.15s; }
+        #login-guest-btn:hover { background:rgba(255,255,255,0.15); }
     </style>
 </head>
 <body>
@@ -161,6 +168,7 @@
                onkeypress="if(event.key==='Enter') checkPassword()">
         <div id="login-error"></div>
         <button id="login-btn" onclick="checkPassword()">Accéder →</button>
+        <button id="login-guest-btn" onclick="guestLogin()">👁 Continuer en invité (lecture seule)</button>
     </div>
 </div>
 
@@ -179,15 +187,16 @@
 <div id="app">
     <div class="header-bar">
         <div class="header-left">
-            <button class="btn-add"    onclick="openTaskForm()">➕ Nouvelle Tâche</button>
-            <button class="btn-actors" onclick="openActorsModal()">👥 Acteurs</button>
-            <button class="btn-themes" onclick="openThemesModal()">🎨 Thèmes</button>
+            <button class="btn-add admin-only"    onclick="openTaskForm()">➕ Nouvelle Tâche</button>
+            <button class="btn-actors admin-only" onclick="openActorsModal()">👥 Acteurs</button>
+            <button class="btn-themes admin-only" onclick="openThemesModal()">🎨 Thèmes</button>
             <button class="btn-export" onclick="exportCSV()">📊 Export CSV</button>
-            <button class="btn-backup" onclick="exportJSON()">💾 Backup JSON</button>
-            <button class="btn-import" onclick="document.getElementById('importFile').click()">📂 Importer JSON</button>
+            <button class="btn-backup admin-only" onclick="exportJSON()">💾 Backup JSON</button>
+            <button class="btn-import admin-only" onclick="document.getElementById('importFile').click()">📂 Importer JSON</button>
             <input type="file" id="importFile" accept=".json" style="display:none" onchange="importJSON(event)">
-            <button class="btn-sort"   onclick="sortTasks()">🔃 Trier</button>
-            <button class="btn-misc"   onclick="openMiscModal()" id="miscBtn">📝 Infos diverses<span class="misc-date" id="miscDateLabel"></span></button>
+            <button class="btn-sort admin-only"   onclick="sortTasks()">🔃 Trier</button>
+            <button class="btn-misc admin-only"   onclick="openMiscModal()" id="miscBtn">📝 Infos diverses<span class="misc-date" id="miscDateLabel"></span></button>
+            <span id="guest-badge">👁 Invité — lecture seule</span>
             <button class="btn-logout" onclick="logout()" title="Se déconnecter">🚪</button>
             <div class="codir-date-wrap">
                 <label>📅 Prochain CODIR</label>
@@ -346,6 +355,7 @@
     window._miscText      = "";
     window._miscLastDate  = "";
     window._codirDate     = "";
+    window._isGuest       = false;
 
     window._DEFAULT_TASKS  = [{"id": "id_1770624225608", "theme": "animation", "title": "Feuille de route gouvernance", "desc": "Lab d'Auvergne - Rhône-Alpes", "status": "todo", "priority": "Normale", "start": "2026-02-18", "end": "2026-02-18", "actors": ["Denis", "Michel Ciocci", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771834077619", "theme": "animation", "title": "Séminaire Partenariats NAQ (interne FT) - Efficience et impact", "desc": "1/2 journée de travail \"Concevoir une action à impact sur son territoire\" autour de \"Comment améliorer durablement le retour à l'emploi des DE BOE\" - intervention sur efficience et impact Nadège", "status": "todo", "priority": "Normale", "start": "2026-02-24", "end": "2026-02-24", "actors": ["Nadège", "Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786737955", "theme": "animation", "title": "Audio pilotage", "desc": "Sujet Présentation MEE. Annonce date boot camp. Prez Share point. Autre sujets? (Suggestion NM : Réflexes de l'efficience - pilotage par l'impact ?)", "status": "todo", "priority": "Normale", "start": "2026-02-26", "end": "2026-02-26", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771785898427", "theme": "animation", "title": "Flash DRAO du 02 03", "desc": "Présentation FTAE par NAQ et Share point avec Halima + Reflexe de l'efficience impact?", "status": "todo", "priority": "Normale", "start": "2026-03-02", "end": "2026-03-02", "actors": ["Nicolas", "Arnaud", "Mike", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771177827591", "theme": "animation", "title": "Finalisation café de la perf formation", "desc": "Filage prévu jeudi. Viser des supports finalisé à cette date.", "status": "todo", "priority": "Normale", "start": "2026-02-23", "end": "2026-03-06", "actors": [], "url": "", "archived": true, "comments": ["Préparer / reprndre  les éléments d'analayse en prévision du 11 mars. Message impact (avec exemple sur la formation). Impact formation par public, lien TAE Fprio. Présentaion outils (priorisation et Tb FTAE)"], "lastMod": 0}, {"id": "id_1772297423300", "theme": "animation", "title": "Webinaire évolutions du tableau de bord RPE", "desc": "De 14:00 à 14:45 ouvert à tous.\nInvitation communauté Resana", "status": "todo", "priority": "Normale", "start": "2026-03-06", "end": "2026-03-06", "actors": ["Denis"], "url": "https://teams.microsoft.com/meet/31765579574718?p=Seys8M7WKGdnfULACJ", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773043462439", "theme": "animation", "title": "Webinaire public RSA", "desc": "Présentation des évolutions du tableau de bord RPE", "status": "todo", "priority": "Normale", "start": "", "end": "2026-03-09", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772999040112", "theme": "animation", "title": "Café de la perf Formation", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-10", "end": "2026-03-10", "actors": ["Halima", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773151707977", "theme": "animation", "title": "Café de la perf Formation (Copie)", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-10", "end": "2026-03-10", "actors": ["Halima", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773156224088", "theme": "animation", "title": "Café de la perf Formation (Copie) (Copie)", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-10", "end": "2026-03-10", "actors": ["Halima", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227386220", "theme": "animation", "title": "Séminaire Managers ARA (3/03) et DA BFC (12 mars)", "desc": "- Finaliser les supports de présentation", "status": "todo", "priority": "Normale", "start": "2026-03-03", "end": "2026-03-12", "actors": ["Nadège", "Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997036786", "theme": "animation", "title": "Séminaire DA BFC", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-12", "end": "2026-03-12", "actors": ["Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997197913", "theme": "animation", "title": "Séminaire RPE pilotage par l'impact Var et  BFC - 10/03 et 13/03", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-10", "end": "2026-03-13", "actors": ["Nadège", "Sylvie", "Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773572834229", "theme": "animation", "title": "Visio DPSR", "desc": "Intro / CRE / Travaux AFG (présentation AFG) / lancement travaux efficience avec macro chiffrage ETP par thématique.", "status": "todo", "priority": "Normale", "start": "2026-03-18", "end": "2026-03-18", "actors": ["Nathalie", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773647528425", "theme": "animation", "title": "Audio pilotage", "desc": "Sujet à caler. Présentation du support RMD absenteisme,  intervention Alexandre sur mode calcul TAE + cibles prospection.", "status": "todo", "priority": "Normale", "start": "2026-03-19", "end": "2026-03-19", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774246504496", "theme": "animation", "title": "Webinaire commun DGEFP /FT portant notamment sur les comités territoriaux pour l’emploi : démarche sur l’amélioration continue et la feuille de route industrie.", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-26", "end": "2026-03-26", "actors": ["Matthieu", "Denis", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774854432563", "theme": "animation", "title": "Immersion unedic DG", "desc": "Intervention avec M Manotte sur perf par l'impact", "status": "todo", "priority": "Normale", "start": "2026-04-02", "end": "2026-04-02", "actors": ["Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776064718462", "theme": "animation", "title": "Préconisations CLPE - Fiches action", "desc": "Webinaire organisé par la région Occitanie autour des fiches action.", "status": "todo", "priority": "Normale", "start": "2026-04-14", "end": "2026-04-14", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772209797859", "theme": "animation", "title": "Revues d'impact en bilatérale", "desc": "Corse, NAQ, La Réunion, PACA, Normandie, IDF, Guyane, ARA, Occitanie\nSemaine prochaine: PDL, BFC, HDF, Martinique", "status": "todo", "priority": "Haute", "start": "2026-03-05", "end": "2026-04-15", "actors": ["laurence", "Sylvie", "Laurent"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776064800888", "theme": "animation", "title": "Webinaire DGEFP", "desc": "Benjamin Maurice et Thibault Guilluy vous convient à un webinaire commun portant notamment sur les comités territoriaux pour l’emploi : démarche sur l’amélioration continue et la feuille de route industrie.", "status": "todo", "priority": "Normale", "start": "2026-04-15", "end": "2026-04-15", "actors": ["Denis", "Nadège", "Matthieu"], "url": "https://teams.microsoft.com/meet/36328085012253?p=sgBvqBfAK41FIBA01c", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776665096845", "theme": "animation", "title": "Prépa RMD marqueurs du changement pilotage des DR et pouvoir d'agir", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-04-21", "end": "2026-04-24", "actors": ["Nadège", "Nicolas"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771839325491", "theme": "animation", "title": "GT Prise en main du tableau de bord RPE", "desc": "Un groupe de travail associant les régions IDF, AURA, GUA va travailler sur des ateliers de prise en main des tableaux de bord RPE. XP dans les séminaires par l'impact.", "status": "doing", "priority": "Normale", "start": "2026-02-23", "end": "2026-04-30", "actors": ["Denis", "Nadège"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774211072009", "theme": "animation", "title": "Courrier + synthèses revue d'impact + EPA DG DR", "desc": "Envoyer les courriers en PDF à chaque DR puis copie aux DGA. \nIdée, quid de courrier DG > agence qui ont progressé fortement sur des indicateurs objectivables.", "status": "todo", "priority": "Normale", "start": "2026-04-13", "end": "2026-04-30", "actors": ["Laurent", "laurence", "Sylvie", "Nicolas"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771787391645", "theme": "animation", "title": "Café de la perf impact", "desc": "Déroulé et témoignages\nUne agence identifié (Bron). Recherche de un à 2 en plus. Support mis en ligne. \nQuid d'un after ou pas? Décision vendredi. \nPiste : faire que les régions prennent la gestion de cet after?", "status": "doing", "priority": "Normale", "start": "2026-05-05", "end": "2026-05-05", "actors": ["Nadège", "Sylvie", "Laurent", "Nicolas", "Matthieu", "Laurence"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771787149444", "theme": "animation", "title": "Efficience plateformes - préparation séminaire DPSR avec DG et DGA", "desc": "Etat des lieux enquête ETP des plateformes (échéance 17 avril)", "status": "doing", "priority": "Normale", "start": "2026-05-06", "end": "2026-05-06", "actors": [], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771227435933", "theme": "animation", "title": "Séminaire RPE pilotage par l'impact - 10 mars (Var) et 13 mars (Dijon)", "desc": "Préparation études de cas en cours", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Sylvie"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210851780", "theme": "animation", "title": "Horizon managers", "desc": "Présentation + Atelier", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Matthieu", "Nadège", "Halima", "Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210671612", "theme": "animation", "title": "Commission indicateurs CNE", "desc": "Mercredi", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["denis", "Matthieu", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774852906698", "theme": "animation", "title": "Séminaires RPE - Carcassonne et Nevers", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Denis", "Laurent"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776669542177", "theme": "animation", "title": "Séminaire RPE - Chardonnay 71 BFC", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Sylvie"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771227269921", "theme": "efficience", "title": "Flux entrées/sorties FS par région en 2025", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-16", "end": "2026-03-20", "actors": ["Dorothée"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786446716", "theme": "efficience", "title": "Boot camp \"communauté pilotage\"", "desc": "Préparer boot camp avec accademie FT, Nicolas Halima Christine.", "status": "doing", "priority": "Normale", "start": "2026-02-23", "end": "2026-04-09", "actors": ["Nicolas", "Halima"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776018775426", "theme": "efficience", "title": "Animation communauté", "desc": "Donner suite boot camp : orga roupe de travail. Adapattion ODJ audio pilotage. Prépa carto des compétence. pousser rapidement des QW (canaux teams...).", "status": "todo", "priority": "Normale", "start": "2026-04-13", "end": "2026-04-17", "actors": ["Nicolas", "Halima"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227689452", "theme": "efficience", "title": "TDB ETP et portefeuilles", "desc": "Le sujet avance avec l'appui des équipe cap.", "status": "doing", "priority": "Haute", "start": "2026-04-20", "end": "2026-05-15", "actors": ["Dorothée", "Emmanuel"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1776019203903", "theme": "efficience", "title": "Chantier plateforme", "desc": "Poser le cadre, aligner FTS Dir perf, DGA OP. Analyser retour carto ETP. Préparer sémainire du 6 mai.", "status": "done", "priority": "Normale", "start": "2026-04-13", "end": "2026-05-30", "actors": ["Nicolas", "Dorothée"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771227726342", "theme": "efficience", "title": "Business Plan FT", "desc": "Commencer à écrire le narratif ; \nRDV DG ADF Cette semaine - logique d'invest social :  Comment les actions de FT vont permettre des économies à 5 ans. Lien CD : impact + de l'acco des RSA.", "status": "done", "priority": "Normale", "start": "", "end": "", "actors": ["Matthieu", "Nadège"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774211034283", "theme": "efficience", "title": "V0 Trajectoire CRE", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210727452", "theme": "efficience", "title": "Déjeuner Philippe Hedde", "desc": "Jeudi", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Dorothée"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774212502222", "theme": "efficience", "title": "Préparer tableau de synthèse des CDD pour 2026 par région (demande CSEC)", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Dorothée"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786639107", "theme": "interne", "title": "Pot de départ de Cécile", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-02-24", "end": "2026-02-24", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786803915", "theme": "interne", "title": "Flash dir perf de ce vendredi", "desc": "Quels sujets ? Prez Share point? Point communauté? (Suites charte ?)", "status": "todo", "priority": "Normale", "start": "2026-02-27", "end": "2026-02-27", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772297165889", "theme": "interne", "title": "Micro formation - Racontez une histoire avec l'IA", "desc": "De 11:00 à 12:00", "status": "todo", "priority": "Normale", "start": "2026-03-03", "end": "2026-03-03", "actors": ["Denis"], "url": "https://teams.microsoft.com/meet/35601878163717?p=lmF2gRz0CqAewYBTcF", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997157023", "theme": "interne", "title": "Séminaire DRAO - organisation services pilotage", "desc": "Arbitrage sujet rattachement CMDD", "status": "todo", "priority": "Normale", "start": "2026-03-11", "end": "2026-03-11", "actors": ["Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772999157464", "theme": "interne", "title": "petit dej dir perf", "desc": "Présence DGA tech, + quels sujets", "status": "todo", "priority": "Normale", "start": "2026-03-12", "end": "2026-03-12", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772209561203", "theme": "interne", "title": "Journée d'accueil DGA tech", "desc": "Venue DGA tech : 12 mars : -\tPoint réorg très rapide DGA TECH et P&S\n-\tPartager la vision et roadmap aux travers de sujets actuels\no\tSophie !\no\tNMA (nouvelles MSA)\no\tPlateforme Data et outils BI\n-\tMieux suivre nos sujets, actions et mieux s’informer \n\n•\t23 avril\n•\t14 mai\n•\t25 juin", "status": "todo", "priority": "Normale", "start": "2026-03-12", "end": "2026-03-12", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772398951120", "theme": "interne", "title": "Traitement des remontées des services pilotage régions", "desc": "Quelle répartition entre les 3 activités ? Quelle évolution des ETP en DR depuis un an ?", "status": "todo", "priority": "Normale", "start": "2026-03-12", "end": "2026-03-13", "actors": ["Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771786881635", "theme": "interne", "title": "Suite candidature Ivana Terlevic", "desc": "", "status": "done", "priority": "Normale", "start": "2026-02-23", "end": "2026-03-14", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773573546079", "theme": "interne", "title": "Soutenance Dorothée LEAN", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-19", "end": "2026-03-19", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774629950931", "theme": "interne", "title": "Annonce nomination Mike et Stéphanie", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-30", "end": "2026-03-30", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774629977563", "theme": "interne", "title": "Pot Arnaud", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-03-31", "end": "2026-03-31", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773911611462", "theme": "interne", "title": "Audio pilotage", "desc": "Appro pilotage par l'impact et acco intensif (ciblage)", "status": "todo", "priority": "Normale", "start": "2026-04-02", "end": "2026-04-02", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773573696968", "theme": "interne", "title": "Accueil Imersion O Laux (Occ ) et P Marchand (CVL) à la dir perf", "desc": "Mardi après midi à la Dir perf, Mercredi Dir perf ou DQS, et Jeudi Dir perf (boot camp)", "status": "doing", "priority": "Normale", "start": "2026-04-07", "end": "2026-04-10", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771948296600", "theme": "interne", "title": "EPA", "desc": "", "status": "doing", "priority": "Normale", "start": "", "end": "2026-04-30", "actors": ["Matthieu", "Nicolas", "Arnaud", "Dorothée", "Mike"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773573070076", "theme": "interne", "title": "Codire avec la DGA tech", "desc": "Suivi des action engagée avec la DGA tech lors du Codir. Partager les actions via nouvel outil similaire à celui du Codir flah (Denis). Adapter les participants aux thématiques (très technique)", "status": "done", "priority": "Normale", "start": "2026-03-12", "end": "2026-06-30", "actors": ["Nicolas", "Denis"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1771178013471", "theme": "interne", "title": "Accueil immersion accompagnement collègues réseau", "desc": "", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Nicolas", "alexandre"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774629903019", "theme": "interne", "title": "Datse gouvernance direction", "desc": "•\tPetit-déjeuner : mardi 19 mai \n•\tRéunion de direction :  sur la ½ journée. Le jeudi 16 avril matin A confirmer?\n•\tSéminaire fin 1er semestre mardi 30 juin", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210901168", "theme": "interne", "title": "Pot de départ Nathalie Siprès", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210974946", "theme": "interne", "title": "Flash Dir Perf", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Nicolas", "Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1769680407539", "theme": "outils", "title": "Webinaire évolutions du tableau de bord RPE", "desc": "De 14h00 à 14h45, lien de la visio proposée à la communauté Resana TdB RPE", "status": "todo", "priority": "Normale", "start": "2026-02-06", "end": "2026-02-06", "actors": ["Denis"], "url": "https://tinyurl.com/RPEFEB", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227221320", "theme": "outils", "title": "COPIL outils", "desc": "Focus IOP Sel po à confirmer", "status": "doing", "priority": "Normale", "start": "2026-03-23", "end": "2026-02-23", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774246299376", "theme": "outils", "title": "RSA et formation webinaire TDB RPE", "desc": "Intervention webinaire hebdomadaire DGEFP/CD/FT", "status": "todo", "priority": "Normale", "start": "2026-03-23", "end": "2026-03-23", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774246350220", "theme": "outils", "title": "Webinaire correspondants EPA", "desc": "Présentation du tableau de bord RPE", "status": "todo", "priority": "Normale", "start": "2026-03-23", "end": "2026-03-23", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1770624137145", "theme": "outils", "title": "Tdb RPE - Territoires comparables", "desc": "Livraison des évolutions possible dès le mois de février.\nAmélioration sur la page Analyse par public sur mars.", "status": "doing", "priority": "Normale", "start": "2026-02-09", "end": "2026-03-31", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774855829146", "theme": "outils", "title": "Webinaire de présentation TDB RPE", "desc": "", "status": "todo", "priority": "Normale", "start": "2026-04-02", "end": "2026-04-02", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774855225151", "theme": "outils", "title": "PIP planning de printemps hybride", "desc": "Distance / Présence selon les équipes", "status": "todo", "priority": "Normale", "start": "2026-03-30", "end": "2026-04-03", "actors": ["Denis", "Arnaud", "Franck", "Guillaume", "Olivier"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772209411971", "theme": "outils", "title": "Finaliser les périmètre Produits de la direction", "desc": "Suite à la journée du 12 01, finaliser notre vision des produites de la direction", "status": "done", "priority": "Normale", "start": "2026-01-12", "end": "2026-04-30", "actors": [], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1770624334433", "theme": "outils", "title": "Tableau de bord RPE - Indicateurs spécifiques", "desc": "Possibilité de définir des indicateurs spécifiques à chaque territoire via un catalogue ou en saisie libre.", "status": "done", "priority": "Normale", "start": "", "end": "2026-04-30", "actors": ["Denis"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1773043755085", "theme": "outils", "title": "Simulateur d'impact / ROI", "desc": "Test d'un outil en ligne", "status": "doing", "priority": "Normale", "start": "", "end": "2026-04-30", "actors": ["Denis", "Alexandre"], "url": "https://reseau-pour-l-emploi.github.io/simulateur_roi/", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1776018855706", "theme": "outils", "title": "Avancer sur rationalisation des outils.", "desc": "Mise à dispo organisée des PWBI. Trajectoire P2A IOP AetP vs Sophie notamment.", "status": "done", "priority": "Normale", "start": "", "end": "", "actors": [], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1770580969658", "theme": "performance", "title": "Indemnisation - TP, recouvrement et PPA", "desc": "- Simulations sur PPA et modifications de la QS", "status": "todo", "priority": "Haute", "start": "2026-02-16", "end": "2026-02-20", "actors": ["Mike"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1770581039601", "theme": "performance", "title": "Sujet en Flash DRAO de ce lundi", "desc": "HDF présente MEE, Passer message sur MAJ Opéra, qques mots sur Reflexe de l'efficience (+ annonce café de la perf Impact du 05/05 ?)", "status": "todo", "priority": "Normale", "start": "2026-02-23", "end": "2026-02-23", "actors": ["Nicolas", "Arnaud", "Dorothée"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227110877", "theme": "performance", "title": "RMD négo cibles Matthieu à Distance", "desc": "Présentation des 5 scénarios\nPossible Négo dans les 12h00 en suivant", "status": "todo", "priority": "Haute", "start": "2026-02-24", "end": "2026-02-24", "actors": ["Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771785829891", "theme": "performance", "title": "Instance CA présentation cible", "desc": "Jeudi après midi présentation en CA des cibles", "status": "todo", "priority": "Normale", "start": "2026-02-26", "end": "2026-02-26", "actors": ["Nicolas"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772209673587", "theme": "performance", "title": "Cible région. Finalisation des remontées", "desc": "Dead line lundi midi. Analyse en suivant pour passer en visio DG mardi soir", "status": "todo", "priority": "Haute", "start": "2026-03-02", "end": "2026-03-03", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773043569194", "theme": "performance", "title": "Séminaire DARP", "desc": "Participation en tant qu'observateur.\nLes délégués à l’accompagnement des entreprises et des parcours professionnels (DARP)", "status": "todo", "priority": "Normale", "start": "2026-03-11", "end": "2026-03-11", "actors": ["Denis"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997248384", "theme": "performance", "title": "TP - constituer infos sur période remise en cause", "desc": "Réunion cab 13/03", "status": "todo", "priority": "Normale", "start": "2026-03-13", "end": "2026-03-13", "actors": ["Mike", "youssef"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772440947150", "theme": "performance", "title": "Copil métiers DIR", "desc": "DIR le 17/03 / Support partagé \nDémarche efficience point cock pit / Point CSP / Point TP (à compléter le fichier).", "status": "todo", "priority": "Normale", "start": "2026-03-17", "end": "2026-03-17", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1773573197651", "theme": "performance", "title": "Audio Alerte pilotage", "desc": "Première audio Alerte pilotage avec région en lead : Naq et ARA", "status": "todo", "priority": "Normale", "start": "2026-03-18", "end": "2026-03-18", "actors": ["Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997288814", "theme": "performance", "title": "RMD", "desc": "Absentéisme et ciblage acco intensif / Arbitrage rattachement CMDD", "status": "todo", "priority": "Haute", "start": "2026-03-19", "end": "2026-03-19", "actors": ["Alexandre", "Nadège"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776066153781", "theme": "performance", "title": "TP hors fraude", "desc": "Communication sur les cibles TP hors fraude. Faire un état de la perf sur le 1er semestre.", "status": "todo", "priority": "Normale", "start": "2026-04-13", "end": "2026-04-16", "actors": [], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1776669483422", "theme": "performance", "title": "Point de suivi LPE - FT/DGEFP", "desc": "Sujet autour des réorientations des DE", "status": "todo", "priority": "Normale", "start": "2026-04-22", "end": "2026-04-22", "actors": ["Mike"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1775978505103", "theme": "performance", "title": "Support CRE + animation RMD", "desc": "Voir avec DADE, DPFCI et Dir gouvernance\nHistoire : en repartant de ce qu'on a fait, comment améliorer encore le CRE. Quelle piste pour fin 2026 avec les nouvelles requêtes ciblées. Quelle horizon 20230 : universalisation du CRE. CRE 360. Meilleur ciblage.", "status": "todo", "priority": "Normale", "start": "2026-04-23", "end": "2026-04-23", "actors": ["Matthieu", "Nadège"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774811596188", "theme": "performance", "title": "Suites du dernier COPIL S3", "desc": "", "status": "doing", "priority": "Normale", "start": "2026-04-20", "end": "2026-05-06", "actors": ["Mike", "Arame", "Elodie"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1775978533848", "theme": "performance", "title": "Support RMD revue 360", "desc": "Indicateurs à compléter puis synthèse et messages clés", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Mike", "Sophie"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774813255980", "theme": "performance", "title": "TDB MEE", "desc": "Y a t il des évolutions en cours ? Les dernières évolutions aident un peu, mais il y encore des marges d'amélioration !", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": [], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1776018999730", "theme": "performance", "title": "Organiser la production de tb et de données par les direction métier et la DGA Tech", "desc": "Multiplicité de tb provenant de différents canaux (DGA tech métier...). A embarquer dans nos codire x DGA tech", "status": "done", "priority": "Normale", "start": "", "end": "", "actors": ["Mike", "alexandre"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774210554163", "theme": "performance", "title": "Suite absentéisme", "desc": "Echange Rosen + suite analyses + pilotage à installer", "status": "done", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Nicolas"], "url": "", "archived": false, "comments": [], "lastMod": 0}, {"id": "id_1774813729522", "theme": "performance", "title": "Prépa canevas RMD", "desc": "", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Matthieu", "Mike"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772396388284", "theme": "performance", "title": "Support comité de performance", "desc": "", "status": "todo", "priority": "Haute", "start": "", "end": "", "actors": ["Arnaud"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227832642", "theme": "performance", "title": "Ciblage accompagnement intensif + doc RMD", "desc": "- Mesurer la distribution des entrées en intensif en fonction de l'éloignement à l'emploi, par région.", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Alexandre"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772397750913", "theme": "performance", "title": "Doc RMD absentéisme DE", "desc": "", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Nadège", "Nicolas", "Alexandre"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1771227878299", "theme": "performance", "title": "TDB DYN et FTAE", "desc": "", "status": "doing", "priority": "Normale", "start": "", "end": "", "actors": ["Arnaud", "Mike"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210787426", "theme": "performance", "title": "Points de suivi acco intensif + commission inclusion", "desc": "Mercredi et jeudi", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Mike", "Alexandre", "Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1774210644408", "theme": "performance", "title": "COPIL S3", "desc": "Zoom POEI + AFC", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Matthieu"], "url": "", "archived": true, "comments": [], "lastMod": 0}, {"id": "id_1772997104036", "theme": "performance", "title": "Comité de performance - début avril", "desc": "Faire des propositions sur l'indicateur DELD.\nDemandeur leur avis aux stats. Faire des test en lien avec la LPE.", "status": "todo", "priority": "Normale", "start": "", "end": "", "actors": ["Arnaud"], "url": "", "archived": true, "comments": [], "lastMod": 0}];
     window._DEFAULT_ACTORS = ["Alexandre","Arame","Arnaud","Denis","Dorothée","Elodie","Emmanuel","Franck","Guillaume","Halima","Laurence","Laurent","Matthieu","Michel Ciocci","Mike","Nadège","Nathalie","Nicolas","Olivier","Sophie","Sylvie","Youssef"];
@@ -572,11 +582,24 @@ function checkPassword() {
             }
         });
 }
+function guestLogin() {
+    sessionStorage.setItem("kanban_auth","guest");
+    window._isGuest=true;
+    document.getElementById("login-screen").style.display  = "none";
+    document.getElementById("loading-screen").style.display = "flex";
+    if (window._firebaseReady && window._firstSyncDone) {
+        document.getElementById("loading-screen").style.display="none";
+        document.getElementById("app").style.display="block";
+        initApp();
+    }
+}
 function logout() {
     if(confirm("Se déconnecter ?")){ sessionStorage.removeItem("kanban_auth"); location.reload(); }
 }
 window._bootApp = function() {
-    if(sessionStorage.getItem("kanban_auth")==="ok"){
+    var auth=sessionStorage.getItem("kanban_auth");
+    if(auth==="ok"||auth==="guest"){
+        window._isGuest=(auth==="guest");
         document.getElementById("login-screen").style.display="none";
         document.getElementById("loading-screen").style.display="flex";
     }
@@ -588,10 +611,14 @@ window.initApp = function() {
     var cd=document.getElementById("codirDate");
     if(cd && window._codirDate) cd.value=window._codirDate;
     updateMiscDateLabel();
+    document.body.classList.toggle("guest-mode",!!window._isGuest);
+    if(cd) cd.disabled=!!window._isGuest;
     render();
 };
 window.onload = function() {
-    if(sessionStorage.getItem("kanban_auth")==="ok"){
+    var auth=sessionStorage.getItem("kanban_auth");
+    if(auth==="ok"||auth==="guest"){
+        window._isGuest=(auth==="guest");
         document.getElementById("login-screen").style.display="none";
         document.getElementById("loading-screen").style.display="flex";
         if(window._firebaseReady && window._firstSyncDone){
@@ -684,7 +711,7 @@ function render() {
         var div=document.createElement("div");
         div.className="task"+(t.archived?" archived":"");
         div.style.borderLeftColor=conf.color;
-        div.draggable=!t.archived;
+        div.draggable=!t.archived && !window._isGuest;
         div.id=t.id;
         div.ondragstart=(function(tid){ return function(e){ e.dataTransfer.setData("text",tid); div.classList.add('dragging'); }; })(t.id);
         div.ondragend=function(){ div.classList.remove('dragging'); };
@@ -704,15 +731,17 @@ function render() {
             '<div style="margin:4px 0;">'+(t.actors||[]).map(function(a){ return '<span class="actor-label">'+esc(a)+'</span>'; }).join('')+'</div>'+
             urlStr+
             '<div>'+(t.comments||[]).map(function(c,i){
-                return '<div class="comment-box"><span>'+esc(c)+'</span><span class="del-com" onclick="deleteComment(\''+t.id+'\','+i+')">×</span></div>';
+                return '<div class="comment-box"><span>'+esc(c)+'</span>'+(window._isGuest?'':'<span class="del-com" onclick="deleteComment(\''+t.id+'\','+i+')">×</span>')+'</div>';
             }).join('')+'</div>'+
-            '<div class="task-actions">'+
-                '<button onclick="addComment(\''+t.id+'\')"    style="background:#2ecc71;">💬</button>'+
-                '<button onclick="editTask(\''+t.id+'\')"      style="background:#f39c12;">✎</button>'+
-                '<button onclick="duplicateTask(\''+t.id+'\')" style="background:#3498db;">📄</button>'+
-                '<button onclick="archiveTask(\''+t.id+'\')"   style="background:#7f8c8d;">'+(t.archived?'♻️':'📦')+'</button>'+
-                '<button onclick="deleteTask(\''+t.id+'\')"    style="background:#e74c3c;">🗑</button>'+
-            '</div>';
+            (window._isGuest
+                ? '<div class="task-actions"><button onclick="addComment(\''+t.id+'\')" style="background:#2ecc71;">💬</button></div>'
+                : '<div class="task-actions">'+
+                    '<button onclick="addComment(\''+t.id+'\')"    style="background:#2ecc71;">💬</button>'+
+                    '<button onclick="editTask(\''+t.id+'\')"      style="background:#f39c12;">✎</button>'+
+                    '<button onclick="duplicateTask(\''+t.id+'\')" style="background:#3498db;">📄</button>'+
+                    '<button onclick="archiveTask(\''+t.id+'\')"   style="background:#7f8c8d;">'+(t.archived?'♻️':'📦')+'</button>'+
+                    '<button onclick="deleteTask(\''+t.id+'\')"    style="background:#e74c3c;">🗑</button>'+
+                  '</div>');
 
         if(t.archived){ arch.appendChild(div); counts.arch++; }
         else if(cols[t.status]){ cols[t.status].appendChild(div); counts[t.status]++; }
@@ -730,6 +759,7 @@ function fmt(d){ return d?new Date(d).toLocaleDateString('fr-FR',{day:'2-digit',
 
 // ── TRI ──
 function sortTasks(){
+    if(window._isGuest) return;
     window._tasks.sort(function(a,b){
         var la=getThemeConf(a.theme).label, lb=getThemeConf(b.theme).label;
         if(la<lb) return -1; if(la>lb) return 1;
@@ -777,11 +807,13 @@ function renderThemesList(){
     }).join('');
 }
 function changeThemeColor(i, color){
+    if(window._isGuest) return;
     window._themes[i].color=color;
     renderThemesList();
     saveMeta(); render();
 }
 function addTheme(){
+    if(window._isGuest) return;
     var label=document.getElementById("newThemeLabel").value.trim();
     var color=document.getElementById("newThemeColor").value;
     if(!label){ alert("Saisissez un nom de thème."); return; }
@@ -798,6 +830,7 @@ function addTheme(){
     toast('🎨 Thème "'+label+'" ajouté');
 }
 function deleteTheme(i){
+    if(window._isGuest) return;
     var t=window._themes[i];
     var used=window._tasks.filter(function(x){ return x.theme===t.key; }).length;
     if(used>0 && !confirm("Ce thème est utilisé par "+used+" tâche(s). Supprimer quand même ?")) return;
@@ -810,6 +843,7 @@ function deleteTheme(i){
 
 // ── FORMULAIRE TÂCHE ──
 function openTaskForm(){
+    if(window._isGuest) return;
     document.getElementById("taskId").value="";
     document.getElementById("titleInput").value="";
     document.getElementById("description").value="";
@@ -828,6 +862,7 @@ function openTaskForm(){
 function closeTaskForm(){ document.getElementById("taskOverlay").classList.remove("open"); }
 
 function saveTask(){
+    if(window._isGuest) return;
     var title=document.getElementById("titleInput").value.trim();
     if(!title){ alert("Le titre est obligatoire."); return; }
     var id=document.getElementById("taskId").value;
@@ -859,6 +894,7 @@ function saveTask(){
     checkAutoArchive(); render(); closeTaskForm();
 }
 function editTask(id){
+    if(window._isGuest) return;
     var t=window._tasks.find(function(x){ return x.id===id; });
     document.getElementById("taskId").value=t.id;
     document.getElementById("titleInput").value=t.title;
@@ -878,6 +914,7 @@ function editTask(id){
 
 // ── ACTIONS CARTES ──
 function duplicateTask(id){
+    if(window._isGuest) return;
     var idx=window._tasks.findIndex(function(x){ return x.id===id; });
     var copy=JSON.parse(JSON.stringify(window._tasks[idx]));
     copy.id="id_"+Date.now(); copy.title+=" (Copie)"; copy.lastMod=Date.now();
@@ -904,25 +941,29 @@ function saveComment(){
 }
 function closeCommentModal(){ document.getElementById("commentOverlay").classList.remove("open"); }
 function deleteComment(id,idx){
+    if(window._isGuest) return;
     var t=window._tasks.find(function(x){ return x.id===id; });
     t.comments.splice(idx,1); t.lastMod=Date.now();
     saveOneTask(id); render();
 }
 function deleteTask(id){
+    if(window._isGuest) return;
     if(!confirm("Supprimer définitivement ?")) return;
     window._tasks=window._tasks.filter(function(x){ return x.id!==id; });
     if(window._fbDeleteTask) window._fbDeleteTask(id);
     _lsSnap(); render(); toast("🗑 Supprimé");
 }
 function archiveTask(id){
+    if(window._isGuest) return;
     var t=window._tasks.find(function(x){ return x.id===id; });
     t.archived=!t.archived; t.lastMod=Date.now();
     saveOneTask(id); render(); toast(t.archived?"📦 Archivé":"♻️ Désarchivé");
 }
 
 // ── DRAG & DROP ──
-function allowDrop(e){ e.preventDefault(); }
+function allowDrop(e){ if(window._isGuest) return; e.preventDefault(); }
 function drop(e){
+    if(window._isGuest) return;
     e.preventDefault();
     var id=e.dataTransfer.getData("text");
     var dragged=window._tasks.find(function(x){ return x.id===id; });
@@ -991,6 +1032,7 @@ function renderTaskActorChips(){
 }
 function removeActorChip(a){ currentTaskActors=currentTaskActors.filter(function(x){ return x!==a; }); renderTaskActorChips(); }
 function addActorToList(){
+    if(window._isGuest) return;
     var n=document.getElementById("newActorName").value.trim();
     if(n && window._actors.indexOf(n)===-1){ window._actors.push(n); updateActorsDatalist(); saveMeta(); openActorsModal(); document.getElementById("newActorName").value=""; }
 }
@@ -1004,7 +1046,7 @@ function openActorsModal(){
                    '<span onclick="removeActor('+i+')" style="color:#e74c3c;cursor:pointer;font-size:0.85em;font-weight:600;">Supprimer</span></div>';
           }).join("");
 }
-function removeActor(i){ window._actors.splice(i,1); saveMeta(); openActorsModal(); updateActorsDatalist(); }
+function removeActor(i){ if(window._isGuest) return; window._actors.splice(i,1); saveMeta(); openActorsModal(); updateActorsDatalist(); }
 function closeActorsModal(){ document.getElementById("actorsOverlay").classList.remove("open"); }
 
 // ── EXPORT / IMPORT ──
@@ -1022,6 +1064,7 @@ function exportCSV(){
 }
 function exportJSON(){ dl(JSON.stringify(buildPayload(),null,2),"Backup_Kanban_"+td()+".json","application/json"); }
 function importJSON(event){
+    if(window._isGuest) return;
     var file=event.target.files[0]; if(!file) return;
     var reader=new FileReader();
     reader.onload=function(e){
@@ -1055,7 +1098,7 @@ function dl(content,name,type){
 function td(){ return new Date().toISOString().split('T')[0]; }
 
 // ── UTILITAIRES ──
-function saveCodirDate(){ window._codirDate=document.getElementById("codirDate").value; saveMeta(); }
+function saveCodirDate(){ if(window._isGuest) return; window._codirDate=document.getElementById("codirDate").value; saveMeta(); }
 function updateMiscDateLabel(){
     var label=document.getElementById("miscDateLabel"); if(!label) return;
     label.textContent=window._miscLastDate?" — "+new Date(window._miscLastDate).toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric'}):"";
@@ -1063,7 +1106,8 @@ function updateMiscDateLabel(){
 window.updateMiscDateLabel=updateMiscDateLabel;
 function openMiscModal(){ document.getElementById("miscTextarea").value=window._miscText||""; document.getElementById("miscOverlay").classList.add("open"); setTimeout(function(){ document.getElementById("miscTextarea").focus(); },100); }
 function closeMiscModal(){ document.getElementById("miscOverlay").classList.remove("open"); }
-function saveMiscInfo(){ window._miscText=document.getElementById("miscTextarea").value; window._miscLastDate=new Date().toISOString(); updateMiscDateLabel(); saveMeta(); closeMiscModal(); toast("✅ Infos sauvegardées"); }
+function saveMiscInfo(){
+    if(window._isGuest) return; window._miscText=document.getElementById("miscTextarea").value; window._miscLastDate=new Date().toISOString(); updateMiscDateLabel(); saveMeta(); closeMiscModal(); toast("✅ Infos sauvegardées"); }
 function toggleArchives(){ archivesOpen=!archivesOpen; document.getElementById("archives-content").style.display=archivesOpen?"flex":"none"; }
 var _tt;
 function toast(msg){ var el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); clearTimeout(_tt); _tt=setTimeout(function(){ el.classList.remove("show"); },2500); }
